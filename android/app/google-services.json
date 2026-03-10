@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "565292427051",
+    "project_id": "tea-minds",
+    "storage_bucket": "tea-minds.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565292427051:android:616eff01f592de705bc76e",
+        "android_client_info": {
+          "package_name": "com.example.tea_minds"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-kSkPTEacPGHMQft_t9nVE6q0V-kloZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
