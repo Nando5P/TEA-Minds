@@ -47,7 +47,7 @@ lib/
 │   ├── dashboard/       # Paneles de gestión de perfiles.
 │   └── games/           # Carpeta raíz de mini-juegos escalables.
 └── main.dart            # Configuración de arranque y servicios.
-
+````
 ---
 
 ## 📊 Diseño de la Base de Datos (Cloud Firestore)
