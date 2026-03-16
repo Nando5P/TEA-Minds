@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Este archivo lo genera FlutterFire CLI
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'firebase_options.dart';
+import 'data/sources/remote/auth_service.dart';
+import 'data/repositories/auth_repository_impl.dart';
+import 'presentation/blocs/auth/auth_cubit.dart';
+import 'presentation/pages/auth_wrapper.dart';
 
 void main() async {
-  // 1. Aseguramos que los bindings de Flutter estén listos
+  // 1. Aseguramos que Flutter esté listo para plugins nativos
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 2. Inicializamos Firebase con las opciones de tu proyecto
+  
+  // 2. Inicializamos Firebase con las opciones generadas
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const TeaMindsApp());
+  // 3. Preparamos las dependencias (Fontanería)
+  final authService = AuthService();
+  final authRepository = AuthRepositoryImpl(authService);
+
+  runApp(
+    // Inyectamos el Repositorio para que esté disponible en toda la app
+    RepositoryProvider.value(
+      value: authRepository,
+      child: BlocProvider(
+        // Creamos el Cubit y lanzamos el chequeo de sesión automático
+        create: (context) => AuthCubit(authRepository)..appStarted(),
+        child: const TeaMindsApp(),
+      ),
+    ),
+  );
 }
 
 class TeaMindsApp extends StatelessWidget {
@@ -24,11 +43,12 @@ class TeaMindsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: Colors.green, // Color base de nuestros pollitos
+        // Usamos el verde pastel que definimos en el prompt de diseño
+        colorSchemeSeed: const Color(0xFFC8E6C9), 
+        brightness: Brightness.light,
       ),
-      home: const Scaffold(
-        body: Center(child: Text('Conexión establecida 🐥')),
-      ),
+      // El punto de entrada es el Wrapper que acabas de crear
+      home: const AuthWrapper(),
     );
   }
 }
