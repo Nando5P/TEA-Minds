@@ -1,100 +1,73 @@
 # TEA-Minds: Neuro-estimulación con Pollitos 🐥
 
-**TEA-Minds** es una aplicación móvil diseñada para la estimulación cognitiva de niños con Trastorno del Espectro Autista (TEA). El proyecto establece un ecosistema seguro donde **Tutores** y **Especialistas** pueden monitorizar el progreso del menor a través de la gamificación con un personaje personalizable.
+**TEA-Minds** es una aplicación multiplataforma diseñada para la estimulación de procesos cognitivos en niños con Trastorno del Espectro Autista (TEA). El proyecto ofrece un entorno seguro donde **Tutores** y **Especialistas** pueden gestionar perfiles infantiles y monitorizar su progreso a través de actividades gamificadas.
 
-## 🚀 Propuesta de Valor
-* **Gamificación Adaptada**: Interfaz diseñada para las necesidades sensoriales y cognitivas del niño.
-* **Sincronización en Red**: Vinculación en tiempo real entre el entorno familiar y el profesional.
-* **Seguridad Avanzada**: "Modo Niño" blindado mediante PIN y privacidad estricta de datos.
+## 🚀 Estado del Desarrollo (Marzo 2026)
+Actualmente, el proyecto se encuentra en la **Fase de Gestión de Perfiles y Persistencia**. Los hitos alcanzados son:
+* **Infraestructura**: Conexión con Firebase y arquitectura base configurada.
+* **Autenticación**: Sistema de registro y login funcional por roles (Tutor/Especialista).
+* **Gestión de Niños**: Dashboard operativo con creación y visualización de "pollitos" en tiempo real.
 
----
-
-## 🏗️ Arquitectura del Software (Clean Architecture)
-
-Para garantizar un desarrollo escalable, profesional y fácil de testear, se ha implementado una **Arquitectura Limpia** organizada en capas de responsabilidad:
-
-### 1. Capa de DOMAIN (El "Qué")
-Es el núcleo de la aplicación, independiente de cualquier tecnología externa o framework.
-* **Entities**: Definición de clases puras (User, Child, Session).
-* **Repositories Interface**: Contratos que definen cómo debe comportarse la obtención de datos.
-
-### 2. Capa de DATA (El "Cómo")
-Gestiona la comunicación con servicios externos y la persistencia.
-* **Models**: Objetos con lógica de mapeo (JSON/Map) para Firebase y APIs.
-* **Sources**: Implementación técnica de Firebase (Firestore/Auth) y servicios de red (API ARASAAC).
-* **Repositories**: Ejecución real de los contratos definidos en la capa de Domain.
-
-### 3. Capa de FEATURES / PRESENTATION (Vistas)
-Organización modular orientada a funcionalidades para facilitar la expansión de mini-juegos.
-* **Auth**: Módulo de registro y gestión de roles (Tutor/Especialista).
-* **Games**: Catálogo de actividades (Igualar imágenes, Matemáticas, etc.).
-* **Dashboard**: Paneles de control diferenciados según el rol de usuario.
+🔗 **Repositorio oficial:** [https://github.com/Nando5P/TEA-Minds.git](https://github.com/Nando5P/TEA-Minds.git)
 
 ---
 
-## 📂 Estructura de Carpetas (lib/)
+## 🏗️ Arquitectura del Software
+Se ha implementado una **Arquitectura Limpia (Clean Architecture)** para asegurar un código profesional, escalable y fácil de mantener:
 
+1.  **DOMAIN**: El núcleo de la lógica. Contiene las **Entities** (clases puras como `UserApp` y `Child`) y las interfaces de los repositorios.
+2.  **DATA**: Implementación técnica de **Firebase** (Firestore/Auth), repositorios reales y modelos con lógica de mapeo (`fromMap`/`toMap`).
+3.  **PRESENTATION**: Gestión de estado mediante el patrón **BLoC/Cubit** y una interfaz diseñada para evitar ruidos visuales y priorizar la accesibilidad cognitiva.
+
+### 📂 Estructura de Carpetas Actual (`lib/`)
 ```text
 lib/
-├── core/                # Constantes, temas visuales y componentes globales.
-├── domain/              # Lógica de negocio pura (Entidades e Interfaces).
-│   └── entities/        # Clases base (User, Child, Session).
-├── data/                # Implementación de datos y persistencia.
-│   ├── models/          # Modelos con toMap() y fromMap().
-│   └── sources/         # Conectores de Firebase y APIs.
-├── features/            # Módulos y funcionalidades de la app.
-│   ├── auth/            # Registro, Login y Gestión de Roles.
-│   ├── dashboard/       # Paneles de gestión de perfiles.
-│   └── games/           # Carpeta raíz de mini-juegos escalables.
-└── main.dart            # Configuración de arranque y servicios.
+├── core/             # Configuración base y utilidades compartidas.
+├── data/             # Capa de datos (Models y Repositories Impl).
+├── domain/           # Capa de dominio (Entities y Repositories Interface).
+├── models/           # Constantes visuales globales (TEAColors.dart).
+├── presentation/     # Capa visual (Blocs y Pages).
+└── main.dart         # Punto de
 ````
 ---
 
-## 📊 Diseño de la Base de Datos (Cloud Firestore)
+## 📊 Modelo de Datos (Cloud Firestore)
 
 ### Colección: `users`
-* **ID**: `UID` (Proporcionado por Firebase Auth).
-* **Campos**:
-    * `nombre_completo`: (string) Nombre del tutor o especialista.
+* **ID**: `UID` generado por Firebase Auth.
+* **Campos**: 
+    * `nombreCompleto`: (string) Nombre del tutor o especialista.
     * `email`: (string) Correo electrónico de acceso.
-    * `rol`: (string) "tutor" o "especialista".
-    * `pin_seguridad`: (string) Hash del PIN de 4 dígitos para control parental.
-    * `lista_ninos`: (array) Referencias a los documentos de la colección 'ninos'.
+    * `rol`: (string) Rol asignado (Tutor/Especialista).
+    * `pinSeguridad`: (string) PIN de 4 dígitos para control parental.
 
-### Colección: `ninos`
-* **ID**: Automático (Generado por Firestore).
+### Colección: `children`
+* **ID**: Automático generado por Firestore.
 * **Campos**:
-    * `id_publico`: (string) Código único de 8 caracteres (ej: #1aVt77aJ).
-    * `nombre`: (string) Nombre del niño.
-    * `tutor_principal`: (string) UID del usuario creador.
-    * `especialistas`: (array) UIDs de profesionales autorizados.
-    * `config_avatar`: (map) Atributos visuales: {color: string, accesorio: string}.
-
+    * `nombre`: (string) Nombre del niño/a.
+    * `tutor_id`: (string) UID del tutor que creó el perfil.
+    * `color`: (string) Código Hexadecimal para el avatar personalizado.
+    * `tiene_gafas`: **(bool)** Atributo visual para el personaje (pollito).
+    * `created_at`: (timestamp) Fecha de creación para ordenación en el Dashboard.
 
 ---
 
-## 🔒 Lógica de Seguridad y Persistencia
+## 📝 Metodología de Documentación
+El proyecto sigue un proceso de documentación continua:
 
-### Unicidad del ID Público
-Para evitar colisiones de datos y asegurar que el vínculo entre especialista y niño sea correcto, el sistema implementa un flujo de verificación por existencia:
-* **Generación**: Creación aleatoria de un ID alfanumérico de 8 caracteres.
-* **Consulta**: Validación asíncrona en Firestore para confirmar que el código no existe previamente en la base de datos.
-* **Validación**: Registro del perfil solo tras garantizar la exclusividad del ID en toda la plataforma.
-
-### Persistencia de Sesión Automatizada
-La aplicación utiliza la persistencia nativa de Firebase Auth para mantener la sesión abierta tras el cierre del proceso. Esto permite que el niño acceda al entorno de juego de forma inmediata, evitando que el tutor deba introducir credenciales complejas en cada uso.
-
-### Control Parental (PIN)
-La salida del entorno gamificado requiere la validación de un PIN de 4 dígitos. Este PIN se almacena de forma segura en Firestore para permitir el control parental y la gestión de la configuración desde cualquier dispositivo vinculado del tutor.
+* **Memoria Técnica**: Actualización periódica de objetivos, planificación y presupuesto en la documentación oficial del módulo.
+* **Comentarios de Código**: Uso de estándares de Dart para documentar la lógica de negocio y facilitar el mantenimiento.
+* **Control de Versiones**: Gestión de cambios y evolución del software mediante commits descriptivos en GitHub.
+* **Asistencia Técnica**: Validación de patrones de diseño y depuración mediante herramientas de IA avanzada.
 
 ---
 
 ## 🛠️ Stack Tecnológico
-* **Framework**: Flutter (Dart)
-* **Backend**: Firebase (Auth & Firestore)
-* **API Externa**: ARASAAC (REST API para Pictogramas con intercambio de datos en formato JSON)
-* **Persistencia Local**: Hive / Sqflite (Para cumplir con el requerimiento de persistencia en el dispositivo)
-* **Testing**: Implementación de una estrategia de Unit y Widget Testing para asegurar la solvencia del software
+* **Framework**: Flutter (Dart).
+* **Backend**: Firebase (Auth & Firestore).
+* **Gestión de Estado**: BLoC / Cubit.
+* **Entorno**: VS Code.
 
 ---
-**Responsable Técnico**: Fernando Parga Fernández
+**Alumno**: Fernando Parga Fernández  
+**Centro**: I.E.S. Fernando Wirtz Suárez
