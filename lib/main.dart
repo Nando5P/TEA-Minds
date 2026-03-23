@@ -2,31 +2,45 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
-import 'data/sources/remote/auth_service.dart';
-import 'data/repositories/auth_repository_impl.dart';
-import 'presentation/blocs/auth/auth_cubit.dart';
-import 'presentation/pages/auth_wrapper.dart';
+
+// Capa de Datos (Data)
+import 'package:tea_minds/data/sources/remote/auth_service.dart';
+import 'package:tea_minds/data/repositories/auth_repository_impl.dart';
+import 'package:tea_minds/data/repositories/child_repository_impl.dart';
+
+// Capa de Lógica (Presentation/Blocs)
+import 'package:tea_minds/presentation/blocs/auth/auth_cubit.dart';
+import 'package:tea_minds/presentation/blocs/child/child_cubit.dart';
+
+// UI y Colores
+import 'package:tea_minds/presentation/pages/auth_wrapper.dart';
+import 'package:tea_minds/models/teaColors.dart';
 
 void main() async {
-  // 1. Aseguramos que Flutter esté listo para plugins nativos
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // 2. Inicializamos Firebase con las opciones generadas
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // 3. Preparamos las dependencias (Fontanería)
   final authService = AuthService();
   final authRepository = AuthRepositoryImpl(authService);
+  final childRepository = ChildRepositoryImpl();
 
   runApp(
-    // Inyectamos el Repositorio para que esté disponible en toda la app
-    RepositoryProvider.value(
-      value: authRepository,
-      child: BlocProvider(
-        // Creamos el Cubit y lanzamos el chequeo de sesión automático
-        create: (context) => AuthCubit(authRepository)..appStarted(),
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepositoryImpl>.value(value: authRepository),
+        RepositoryProvider<ChildRepositoryImpl>.value(value: childRepository),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthCubit(authRepository)..appStarted(),
+          ),
+          BlocProvider(
+            create: (context) => ChildCubit(childRepository),
+          ),
+        ],
         child: const TeaMindsApp(),
       ),
     ),
@@ -43,11 +57,10 @@ class TeaMindsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        // Usamos el verde pastel que definimos en el prompt de diseño
-        colorSchemeSeed: const Color(0xFFC8E6C9), 
+        colorSchemeSeed: const Color(0xFFC8E6C9),
         brightness: Brightness.light,
+        scaffoldBackgroundColor: TEAColors.background, // Usando tu clase en lib/models/
       ),
-      // El punto de entrada es el Wrapper que acabas de crear
       home: const AuthWrapper(),
     );
   }

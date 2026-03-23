@@ -1,37 +1,40 @@
 import '../../domain/entities/child_entity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChildModel extends Child {
   ChildModel({
     required super.id,
-    required super.idPublico,
     required super.nombre,
-    required super.tutorPrincipal,
+    required super.tutorId,
     required super.especialistas,
-    required super.configAvatar,
+    required super.color,
+    required super.tieneGafas,
+    super.idPublico,
   });
 
-  /// Transforma un Documento de Firebase (Map) en un objeto ChildModel
   factory ChildModel.fromMap(Map<String, dynamic> map, String documentId) {
     return ChildModel(
       id: documentId,
       idPublico: map['id_publico'] ?? '',
       nombre: map['nombre'] ?? '',
-      tutorPrincipal: map['tutor_principal'] ?? '',
-      // Convertimos el dynamic list de Firebase a una lista de Strings
+      tutorId: map['tutor_id'] ?? '',
       especialistas: List<String>.from(map['especialistas'] ?? []),
-      // Convertimos el map de Firebase a nuestro mapa de strings
-      configAvatar: Map<String, String>.from(map['config_avatar'] ?? {}),
+      color: map['color'] ?? '#FFF9C4',
+      // Mapeamos el booleano desde Firebase
+      tieneGafas: map['tiene_gafas'] ?? false, 
     );
   }
 
-  /// Transforma nuestro objeto en un Map para enviarlo a Firebase
+  @override
   Map<String, dynamic> toMap() {
     return {
       'id_publico': idPublico,
       'nombre': nombre,
-      'tutor_principal': tutorPrincipal,
+      'tutor_id': tutorId,
       'especialistas': especialistas,
-      'config_avatar': configAvatar,
+      'color': color,
+      'tiene_gafas': tieneGafas, // Guardamos true/false
+      'created_at': FieldValue.serverTimestamp(),
     };
   }
 }

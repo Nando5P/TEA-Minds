@@ -5,6 +5,7 @@ class TEAColors {
   static const background = Color(0xFFFAFAFA);
   static const cardWhite = Colors.white;
   static const inputBackground = Color(0xFFF5F5F5);
+  static const border = Color(0xFFE0E0E0);
 
   // Colores de texto
   static const textPrimary = Color(0xFF424242);
