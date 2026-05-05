@@ -6,6 +6,8 @@ class Child {
   final String color;
   final bool tieneGafas; 
   final String? idPublico;
+  final int recordEncaje; 
+  final DateTime? createdAt; 
 
   Child({
     required this.id,
@@ -15,5 +17,7 @@ class Child {
     required this.color,
     required this.tieneGafas,
     this.idPublico,
+    this.recordEncaje = 0, // Por defecto empieza en 0
+    this.createdAt,
   });
 }

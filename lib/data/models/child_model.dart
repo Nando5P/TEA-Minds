@@ -1,5 +1,5 @@
-import '../../domain/entities/child_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../domain/entities/child_entity.dart';
 
 class ChildModel extends Child {
   ChildModel({
@@ -10,31 +10,34 @@ class ChildModel extends Child {
     required super.color,
     required super.tieneGafas,
     super.idPublico,
+    super.recordEncaje = 0,
+    super.createdAt,
   });
 
-  factory ChildModel.fromMap(Map<String, dynamic> map, String documentId) {
+  factory ChildModel.fromMap(Map<String, dynamic> map, String id) {
     return ChildModel(
-      id: documentId,
-      idPublico: map['id_publico'] ?? '',
+      id: id,
       nombre: map['nombre'] ?? '',
       tutorId: map['tutor_id'] ?? '',
       especialistas: List<String>.from(map['especialistas'] ?? []),
-      color: map['color'] ?? '#FFF9C4',
-      // Mapeamos el booleano desde Firebase
-      tieneGafas: map['tiene_gafas'] ?? false, 
+      color: map['color'] ?? '#FFCC00',
+      tieneGafas: map['tiene_gafas'] ?? false,
+      idPublico: map['id_publico'],
+      recordEncaje: map['record_encaje'] ?? 0,
+      createdAt: (map['created_at'] as Timestamp?)?.toDate(),
     );
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
-      'id_publico': idPublico,
       'nombre': nombre,
       'tutor_id': tutorId,
       'especialistas': especialistas,
       'color': color,
-      'tiene_gafas': tieneGafas, // Guardamos true/false
-      'created_at': FieldValue.serverTimestamp(),
+      'tiene_gafas': tieneGafas,
+      'id_publico': idPublico,
+      'record_encaje': recordEncaje,
+      'created_at': createdAt ?? FieldValue.serverTimestamp(),
     };
   }
 }

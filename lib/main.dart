@@ -3,7 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
 
-// Capa de Datos (Data)
+// Capa de Dominio (Interfaces) - IMPORTANTES PARA EL TIPADO
+import 'package:tea_minds/domain/repositories/auth_repository.dart';
+import 'package:tea_minds/domain/repositories/child_repository.dart';
+
+// Capa de Datos (Implementaciones)
 import 'package:tea_minds/data/sources/remote/auth_service.dart';
 import 'package:tea_minds/data/repositories/auth_repository_impl.dart';
 import 'package:tea_minds/data/repositories/child_repository_impl.dart';
@@ -23,14 +27,16 @@ void main() async {
   );
 
   final authService = AuthService();
-  final authRepository = AuthRepositoryImpl(authService);
-  final childRepository = ChildRepositoryImpl();
+  // Definimos las variables con el tipo de la INTERFAZ (clase abstracta)
+  final AuthRepository authRepository = AuthRepositoryImpl(authService);
+  final ChildRepository childRepository = ChildRepositoryImpl();
 
   runApp(
     MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<AuthRepositoryImpl>.value(value: authRepository),
-        RepositoryProvider<ChildRepositoryImpl>.value(value: childRepository),
+        // Cambiamos el tipo genérico a la clase abstracta
+        RepositoryProvider<AuthRepository>.value(value: authRepository),
+        RepositoryProvider<ChildRepository>.value(value: childRepository),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -59,7 +65,7 @@ class TeaMindsApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: const Color(0xFFC8E6C9),
         brightness: Brightness.light,
-        scaffoldBackgroundColor: TEAColors.background, // Usando tu clase en lib/models/
+        scaffoldBackgroundColor: TEAColors.background,
       ),
       home: const AuthWrapper(),
     );

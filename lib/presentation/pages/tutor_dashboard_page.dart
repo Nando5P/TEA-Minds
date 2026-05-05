@@ -5,6 +5,7 @@ import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 import '../blocs/child/child_cubit.dart';
 import 'create_child_dialog.dart';
+import 'child_hub_page.dart'; // <--- IMPORTANTE: Importamos la nueva página
 
 class TutorDashboardPage extends StatefulWidget {
   const TutorDashboardPage({super.key});
@@ -104,7 +105,7 @@ class _TutorDashboardPageState extends State<TutorDashboardPage> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 columnas como en tus ejemplos móviles
+              crossAxisCount: 2, 
               crossAxisSpacing: 20,
               mainAxisSpacing: 20,
               childAspectRatio: 0.85,
@@ -152,47 +153,57 @@ class _TutorDashboardPageState extends State<TutorDashboardPage> {
   }
 }
 
-// Widget de Tarjeta Individual
+// Widget de Tarjeta Individual Actualizado con Navegación
 class _ChildCard extends StatelessWidget {
   final dynamic child;
   const _ChildCard({required this.child});
 
   @override
   Widget build(BuildContext context) {
-    // Convertimos el String Hex de la DB a objeto Color de Flutter
     final Color chickColor = Color(int.parse(child.color.replaceFirst('#', '0xFF')));
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(color: chickColor, shape: BoxShape.circle),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Text('🐤', style: TextStyle(fontSize: 40)),
-                if (child.tieneGafas) 
-                  const Text('👓', style: TextStyle(fontSize: 35)),
-              ],
+    return GestureDetector(
+      onTap: () {
+        // Al pulsar, navegamos al Hub del niño pasando sus datos
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChildHubPage(child: child),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(color: chickColor, shape: BoxShape.circle),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Text('🐤', style: TextStyle(fontSize: 40)),
+                  if (child.tieneGafas) 
+                    const Text('👓', style: TextStyle(fontSize: 35)),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(child.nombre,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
-          ),
-          const SizedBox(height: 8),
-          const Text('Ver progreso', style: TextStyle(fontSize: 12, color: TEAColors.bluePastel)),
-        ],
+            const SizedBox(height: 16),
+            Text(child.nombre,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
+            ),
+            const SizedBox(height: 8),
+            const Text('Entrar al modo juego', style: TextStyle(fontSize: 12, color: TEAColors.bluePastel)),
+          ],
+        ),
       ),
     );
   }
