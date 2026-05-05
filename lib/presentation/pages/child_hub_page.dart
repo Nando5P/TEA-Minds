@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../domain/entities/child_entity.dart';
 import '../../models/teaColors.dart';
 import '../../features/game_1/game_1_page.dart'; 
+import '../../features/game_2/game_2_page.dart';
+import '../../features/math_games/math_menu_page.dart';
 import 'pin_dialog.dart';
 
 class ChildHubPage extends StatelessWidget {
@@ -36,64 +38,75 @@ class ChildHubPage extends StatelessWidget {
           ),
 
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '¡Hola, ${child.nombre}!',
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
-                ),
-                const SizedBox(height: 40),
-
-                Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: chickColor,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
-                    ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '¡Hola, ${child.nombre}!',
+                    style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Text('🐤', style: TextStyle(fontSize: 100)),
-                      if (child.tieneGafas) const Text('👓', style: TextStyle(fontSize: 90)),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 60),
+                  const SizedBox(height: 40),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // BOTÓN DE PUZZLES CORREGIDO
-                    _buildGameButton(
-                      context, 
-                      '🧩', 
-                      'Puzzles', 
-                      TEAColors.bluePastel,
-                      () => Navigator.push(
-                        context, 
-                        MaterialPageRoute(
-                          // PASAMOS EL HIJO Y QUITAMOS EL CONST
-                          builder: (context) => Game1Page(child: child), 
+                  // Avatar del pollito
+                  Container(
+                    width: 180,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      color: chickColor,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Text('🐤', style: TextStyle(fontSize: 90)),
+                        if (child.tieneGafas) const Text('👓', style: TextStyle(fontSize: 80)),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 50),
+
+                  // MENÚ DE JUEGOS EN FORMATO TRIÁNGULO
+                  SizedBox(
+                    width: 260, // Forzamos que solo quepan 2 por fila
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 20,
+                      alignment: WrapAlignment.center, // Centra el botón suelto abajo
+                      children: [
+                        _buildGameButton(
+                          context, 
+                          '🧩', 
+                          'Puzzles', 
+                          TEAColors.bluePastel,
+                          () => Navigator.push(context, MaterialPageRoute(builder: (context) => Game1Page(child: child))),
                         ),
-                      ),
+                        
+                        _buildGameButton(
+                          context, 
+                          '🧠', 
+                          'Memoria', 
+                          Colors.orangeAccent,
+                          () => Navigator.push(context, MaterialPageRoute(builder: (context) => Game2Page(child: child))),
+                        ),
+
+                        _buildGameButton(
+                          context, 
+                          '🔢', 
+                          'Mates', 
+                          TEAColors.greenPastel,
+                          () => Navigator.push(context, MaterialPageRoute(builder: (context) => MathMenuPage(child: child))),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 20),
-                    _buildGameButton(
-                      context, 
-                      '🔢', 
-                      'Números', 
-                      TEAColors.greenPastel,
-                      () => print('Próximamente...'),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ],

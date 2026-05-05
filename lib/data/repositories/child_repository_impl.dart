@@ -20,7 +20,7 @@ class ChildRepositoryImpl implements ChildRepository {
       recordEncaje: child.recordEncaje,
       createdAt: child.createdAt ?? DateTime.now(),
     );
-    
+
     await _firestore.collection('children').add(model.toMap());
   }
 
@@ -32,10 +32,10 @@ class ChildRepositoryImpl implements ChildRepository {
         .orderBy('created_at', descending: false)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((doc) => ChildModel.fromMap(doc.data(), doc.id))
-          .toList();
-    });
+          return snapshot.docs
+              .map((doc) => ChildModel.fromMap(doc.data(), doc.id))
+              .toList();
+        });
   }
 
   @override
@@ -46,6 +46,17 @@ class ChildRepositoryImpl implements ChildRepository {
       });
     } catch (e) {
       throw Exception('Error al actualizar el récord: $e');
+    }
+  }
+
+  @override
+  Future<void> updateRecordParejas(String childId, int newRecord) async {
+    try {
+      await _firestore.collection('children').doc(childId).update({
+        'record_parejas': newRecord,
+      });
+    } catch (e) {
+      throw Exception('Error al actualizar récord de parejas: $e');
     }
   }
 }

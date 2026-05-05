@@ -11,6 +11,7 @@ class ChildModel extends Child {
     required super.tieneGafas,
     super.idPublico,
     super.recordEncaje = 0,
+    super.recordParejas = 0,
     super.createdAt,
   });
 
@@ -24,6 +25,7 @@ class ChildModel extends Child {
       tieneGafas: map['tiene_gafas'] ?? false,
       idPublico: map['id_publico'],
       recordEncaje: map['record_encaje'] ?? 0,
+      recordParejas: map['record_parejas'] ?? 0,
       createdAt: (map['created_at'] as Timestamp?)?.toDate(),
     );
   }
@@ -37,6 +39,7 @@ class ChildModel extends Child {
       'tiene_gafas': tieneGafas,
       'id_publico': idPublico,
       'record_encaje': recordEncaje,
+      'record_parejas': recordParejas,
       'created_at': createdAt ?? FieldValue.serverTimestamp(),
     };
   }
