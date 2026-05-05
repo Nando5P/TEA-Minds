@@ -1,83 +1,123 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../models/teaColors.dart';
+import '../../domain/entities/child_entity.dart';
+import '../../domain/repositories/child_repository.dart';
+import '../../models/teaColors.dart'; // Mantengo tu nombre de archivo actual
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 import '../blocs/child/child_cubit.dart';
+import 'child_hub_page.dart'; 
 import 'create_child_dialog.dart';
-import 'child_hub_page.dart'; // <--- IMPORTANTE: Importamos la nueva página
+import 'tutor_stats_page.dart';
 
-class TutorDashboardPage extends StatefulWidget {
+class TutorDashboardPage extends StatelessWidget {
   const TutorDashboardPage({super.key});
 
   @override
-  State<TutorDashboardPage> createState() => _TutorDashboardPageState();
-}
-
-class _TutorDashboardPageState extends State<TutorDashboardPage> {
-  
-  @override
-  void initState() {
-    super.initState();
-    // Al arrancar, le pedimos al Cubit que vigile los niños del tutor actual
-    final authState = context.read<AuthCubit>().state;
-    if (authState is AuthAuthenticated) {
-      context.read<ChildCubit>().watchChildren(authState.user.uid);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthCubit>().state;
+    final String tutorId = (authState is AuthAuthenticated) ? authState.user.uid : '';
+
     return Scaffold(
       backgroundColor: TEAColors.background,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: BlocBuilder<ChildCubit, ChildState>(
-              builder: (context, state) {
-                if (state is ChildLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ChildLoaded) {
-                  return state.children.isEmpty
-                      ? _buildEmptyState(context)
-                      : _buildChildrenGrid(context, state.children);
-                } else if (state is ChildError) {
-                  return Center(child: Text(state.message));
-                }
-                return _buildEmptyState(context);
-              },
-            ),
+      appBar: AppBar(
+        title: const Text('Mis Pollitos', 
+          style: TextStyle(fontWeight: FontWeight.bold, color: TEAColors.textPrimary)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.redAccent),
+            onPressed: () => context.read<AuthCubit>().logout(),
           ),
         ],
+      ),
+      body: StreamBuilder<List<Child>>(
+        stream: context.read<ChildRepository>().getChildrenByTutor(tutorId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          final children = snapshot.data!;
+
+          return GridView.builder(
+            padding: const EdgeInsets.all(20),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: children.length,
+            itemBuilder: (context, index) {
+              final child = children[index];
+              return _buildChildCard(context, child);
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showDialog(
+          context: context,
+          builder: (context) => const CreateChildDialog(),
+        ),
+        backgroundColor: TEAColors.bluePastel,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('Nuevo Pollito', style: TextStyle(color: Colors.white)),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: TEAColors.border, width: 1)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildChildCard(BuildContext context, Child child) {
+    final Color cardColor = Color(int.parse(child.color.replaceFirst('#', '0xFF')));
+
+    return GestureDetector(
+      onTap: () => _showActionMenu(context, child), 
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Row(
+            Stack(
+              alignment: Alignment.center,
               children: [
-                Text('🐤', style: TextStyle(fontSize: 32)),
-                SizedBox(width: 12),
-                Text('TEA-Minds',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500, color: TEAColors.textPrimary),
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: cardColor.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                Text(
+                  child.tieneGafas ? '🐥👓' : '🐥',
+                  style: const TextStyle(fontSize: 45),
                 ),
               ],
             ),
-            IconButton(
-              onPressed: () => context.read<AuthCubit>().logout(),
-              icon: const Icon(Icons.logout, color: TEAColors.textSecondary),
+            const SizedBox(height: 15),
+            Text(
+              child.nombre,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: TEAColors.textPrimary,
+              ),
             ),
           ],
         ),
@@ -85,36 +125,66 @@ class _TutorDashboardPageState extends State<TutorDashboardPage> {
     );
   }
 
-  Widget _buildChildrenGrid(BuildContext context, List<dynamic> children) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  void _showActionMenu(BuildContext context, Child child) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Mis Pollitos',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: TEAColors.textPrimary),
+              Text(
+                '¿Qué quieres hacer con ${child.nombre}?',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              _buildAddButton(context),
+              const SizedBox(height: 25),
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: TEAColors.bluePastel,
+                  child: Icon(Icons.play_arrow, color: Colors.white),
+                ),
+                title: const Text('Ir a jugar', style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Acceder al panel de juegos'),
+                onTap: () {
+                  Navigator.pop(context); 
+                  
+                  // 1. Seleccionamos al niño en el Cubit
+                  context.read<ChildCubit>().selectChild(child); 
+                  
+                  // 2. CORRECCIÓN: Pasamos el child y quitamos el const
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChildHubPage(child: child),
+                    ),
+                  );
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.orange[100],
+                  child: const Icon(Icons.bar_chart, color: Colors.orange),
+                ),
+                title: const Text('Ver progreso', style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Estadísticas y aciertos'),
+                onTap: () {
+                  Navigator.pop(context); 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => TutorStatsPage(child: child)),
+                  );
+                },
+              ),
+              const SizedBox(height: 15),
             ],
           ),
-          const SizedBox(height: 32),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, 
-              crossAxisSpacing: 20,
-              mainAxisSpacing: 20,
-              childAspectRatio: 0.85,
-            ),
-            itemCount: children.length,
-            itemBuilder: (context, index) => _ChildCard(child: children[index]),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -124,86 +194,10 @@ class _TutorDashboardPageState extends State<TutorDashboardPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text('🐣', style: TextStyle(fontSize: 80)),
-          const SizedBox(height: 16),
-          const Text('Aún no tienes ningún pollito',
-            style: TextStyle(fontSize: 18, color: TEAColors.textSecondary),
-          ),
-          const SizedBox(height: 24),
-          _buildAddButton(context),
+          const SizedBox(height: 20),
+          const Text('No tienes pollitos registrados', 
+            style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold)),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAddButton(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: () => showDialog(
-        context: context,
-        builder: (context) => const CreateChildDialog(),
-      ),
-      icon: const Icon(Icons.add),
-      label: const Text('Añadir'),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: TEAColors.greenPastel,
-        foregroundColor: TEAColors.textPrimary,
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-}
-
-// Widget de Tarjeta Individual Actualizado con Navegación
-class _ChildCard extends StatelessWidget {
-  final dynamic child;
-  const _ChildCard({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color chickColor = Color(int.parse(child.color.replaceFirst('#', '0xFF')));
-
-    return GestureDetector(
-      onTap: () {
-        // Al pulsar, navegamos al Hub del niño pasando sus datos
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChildHubPage(child: child),
-          ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(color: chickColor, shape: BoxShape.circle),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Text('🐤', style: TextStyle(fontSize: 40)),
-                  if (child.tieneGafas) 
-                    const Text('👓', style: TextStyle(fontSize: 35)),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(child.nombre,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
-            ),
-            const SizedBox(height: 8),
-            const Text('Entrar al modo juego', style: TextStyle(fontSize: 12, color: TEAColors.bluePastel)),
-          ],
-        ),
       ),
     );
   }
