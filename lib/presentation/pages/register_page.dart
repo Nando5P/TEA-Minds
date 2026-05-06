@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../models/teaColors.dart';
-import '../../domain/entities/user_entity.dart'; // Aquí es donde debe estar UserRole
+import '../../core/widgets/tea_snackbars.dart';
+import '../../data/sources/auth_service.dart';
+import '../../core/theme/teaColors.dart';
+import '../../domain/entities/user_entity.dart';
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 
@@ -18,7 +20,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _pinController = TextEditingController();
   
-  // CORRECCIÓN: Usamos el Enum directamente
   UserRole _selectedRol = UserRole.tutor;
 
   @override
@@ -31,11 +32,17 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _onRegisterPressed() {
+    // Validación de seguridad local
+    if (_nameController.text.isEmpty || _emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      TEASnackBars.show(context, message: 'Por favor, completa los campos obligatorios', isError: true);
+      return;
+    }
+
     final newUser = UserApp(
       uid: '', 
       nombreCompleto: _nameController.text,
       email: _emailController.text,
-      rol: _selectedRol, // Ahora sí encaja el tipo
+      rol: _selectedRol,
       pinSeguridad: _pinController.text,
       listaNinos: [],
     );
@@ -74,7 +81,7 @@ class _RegisterPageState extends State<RegisterPage> {
         SizedBox(height: 16),
         Text(
           'Crear Cuenta',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, color: TEAColors.textPrimary),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
         ),
         Text(
           'Únete a la comunidad TEA-Minds',
@@ -108,13 +115,21 @@ class _RegisterPageState extends State<RegisterPage> {
           _buildRoleSelector(),
           const SizedBox(height: 32),
 
+          // --- AQUÍ ESTÁ EL CAMBIO CRÍTICO ---
           BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthAuthenticated) {
-                Navigator.pop(context); // Volver al login o wrapper tras registrarse
+                // Éxito con SnackBar verde pastel
+                TEASnackBars.show(context, message: '¡Cuenta creada! Bienvenido 🐣', isError: false);
+                Navigator.pop(context); 
               }
+              
               if (state is AuthError) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+                // 1. Aplicamos la traducción (state.message ahora es el código "email-already-in-use")
+                final String mensajeTraducido = AuthService.getFriendlyErrorMessage(state.message);
+                
+                // 2. Llamamos a TU WIDGET (el que tiene el diseño rojo pastel)
+                TEASnackBars.show(context, message: mensajeTraducido, isError: true);
               }
             },
             builder: (context, state) {
@@ -130,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
                   ),
-                  child: const Text('Registrarme', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  child: const Text('Registrarme', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
               );
             },
@@ -140,6 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  // Los métodos auxiliares se mantienen igual pero con retoques de diseño
   Widget _buildRoleSelector() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -161,7 +177,10 @@ class _RegisterPageState extends State<RegisterPage> {
       },
       selectedColor: TEAColors.bluePastel,
       backgroundColor: TEAColors.inputBackground,
-      labelStyle: TextStyle(color: isSelected ? TEAColors.textPrimary : TEAColors.textSecondary),
+      labelStyle: TextStyle(
+        color: isSelected ? TEAColors.textPrimary : TEAColors.textSecondary,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal
+      ),
     );
   }
 

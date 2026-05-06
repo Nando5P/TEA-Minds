@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart'; // Librería de gráficos
 import '../../domain/entities/child_entity.dart';
 import '../../domain/repositories/child_repository.dart';
-import '../../models/teaColors.dart';
+import '../../core/theme/teaColors.dart';
 import '../blocs/stats/stats_cubit.dart';
 
 class TutorStatsPage extends StatelessWidget {

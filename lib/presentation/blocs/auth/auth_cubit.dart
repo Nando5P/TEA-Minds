@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importante añadir esta línea
 import '../../../domain/repositories/auth_repository.dart';
 import '../../../domain/entities/user_entity.dart';
 import 'auth_state.dart';
@@ -33,8 +34,11 @@ class AuthCubit extends Cubit<AuthState> {
       } else {
         emit(AuthUnauthenticated());
       }
+    } on FirebaseAuthException catch (e) {
+      // Enviamos solo el código limpio para que el traductor lo entienda
+      emit(AuthError(e.code));
     } catch (e) {
-      emit(AuthError("Fallo al iniciar sesión: $e"));
+      emit(AuthError("unknown"));
     }
   }
 
@@ -44,8 +48,11 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authRepository.signUp(newUser, password);
       emit(AuthAuthenticated(newUser));
+    } on FirebaseAuthException catch (e) {
+      // AQUÍ ESTABA EL CAMBIO: Emitimos e.code en lugar del string completo
+      emit(AuthError(e.code));
     } catch (e) {
-      emit(AuthError("Fallo en el registro: $e"));
+      emit(AuthError("unknown"));
     }
   }
 

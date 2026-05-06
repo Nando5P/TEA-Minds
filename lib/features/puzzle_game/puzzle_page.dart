@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/child_entity.dart';
 import '../../domain/repositories/child_repository.dart';
-import '../../models/teaColors.dart';
+import '../../core/theme/teaColors.dart';
 import 'puzzle_cubit.dart';
 
 class Game1Page extends StatelessWidget {

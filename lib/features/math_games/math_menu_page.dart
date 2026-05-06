@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/teaColors.dart';
+import '../../core/theme/teaColors.dart';
 import 'math_cubit.dart';
 import 'math_game_page.dart';
 

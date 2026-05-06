@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/child_entity.dart';
-import '../../models/teaColors.dart';
-import '../../features/game_1/game_1_page.dart'; 
-import '../../features/game_2/game_2_page.dart';
+import '../../core/theme/teaColors.dart';
+import '../../features/puzzle_game/puzzle_page.dart'; 
+import '../../features/memory_game/memory_game_page.dart';
 import '../../features/math_games/math_menu_page.dart';
 import 'pin_dialog.dart';
 

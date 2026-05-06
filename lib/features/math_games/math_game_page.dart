@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/child_entity.dart';
 import '../../domain/repositories/child_repository.dart';
-import '../../models/teaColors.dart'; 
+import '../../core/theme/teaColors.dart'; 
 import 'math_cubit.dart';
 
 class MathGamePage extends StatefulWidget {
@@ -28,7 +28,6 @@ class _MathGamePageState extends State<MathGamePage> {
   bool _isShowingFeedback = false;
   String? _feedbackMessage;
 
-  // Colores pastel para el feedback visual de los botones
   static const Color greenPastel = Color(0xFFA5D6A7);
   static const Color redPastel = Color(0xFFEF9A9A);
 
@@ -45,7 +44,6 @@ class _MathGamePageState extends State<MathGamePage> {
             canPop: true,
             onPopInvokedWithResult: (didPop, result) async {
               if (didPop) {
-                // Al salir, guardamos los datos acumulados de la sesión para el tutor
                 await context.read<MathCubit>().finishGame(widget.child.id);
               }
             },
@@ -62,13 +60,13 @@ class _MathGamePageState extends State<MathGamePage> {
                 ),
               ),
               body: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // --- MENSAJE DE FEEDBACK (ESTILO GENIAL) ---
+                    // --- MENSAJE DE FEEDBACK ---
                     SizedBox(
-                      height: 60, // Mantiene la UI estable cuando no hay mensaje
+                      height: 60,
                       child: AnimatedOpacity(
                         opacity: _isShowingFeedback ? 1.0 : 0.0,
                         duration: const Duration(milliseconds: 200),
@@ -77,7 +75,7 @@ class _MathGamePageState extends State<MathGamePage> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 38,
-                            fontWeight: FontWeight.w900, // Grosor máximo corregido
+                            fontWeight: FontWeight.w900,
                             color: _feedbackMessage?.contains('GENIAL') == true 
                                 ? Colors.orange 
                                 : Colors.blueGrey,
@@ -87,9 +85,10 @@ class _MathGamePageState extends State<MathGamePage> {
                       ),
                     ),
 
-                    // --- ÁREA DE LA OPERACIÓN (NÚMEROS EN NEGRO) ---
+                    // --- ÁREA DE LA OPERACIÓN (Corregida con FittedBox) ---
                     Container(
-                      padding: const EdgeInsets.all(40),
+                      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 15),
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(30),
@@ -100,21 +99,24 @@ class _MathGamePageState extends State<MathGamePage> {
                           )
                         ],
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildNumberText(state.numA.toString()),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: _getOperatorIcon(state.currentOp),
-                          ),
-                          _buildNumberText(state.numB.toString()),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Text('=', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.black)),
-                          ),
-                          _buildNumberText('?'),
-                        ],
+                      child: FittedBox( // <--- Esto evita el error de la imagen
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildNumberText(state.numA.toString()),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: _getOperatorIcon(state.currentOp),
+                            ),
+                            _buildNumberText(state.numB.toString()),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('=', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.black)),
+                            ),
+                            _buildNumberText('?'),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -131,9 +133,8 @@ class _MathGamePageState extends State<MathGamePage> {
                       itemCount: state.options.length,
                       itemBuilder: (context, index) {
                         final option = state.options[index];
-                        
-                        // Lógica de colores de fondo durante el feedback
                         Color btnColor = Colors.white;
+
                         if (_isShowingFeedback) {
                           if (option == state.correctAnswer) {
                             btnColor = greenPastel;
@@ -145,7 +146,7 @@ class _MathGamePageState extends State<MathGamePage> {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: btnColor,
-                            disabledBackgroundColor: btnColor, // Mantiene el color al desactivar
+                            disabledBackgroundColor: btnColor,
                             disabledForegroundColor: Colors.black,
                             elevation: _isShowingFeedback ? 0 : 4,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -169,7 +170,6 @@ class _MathGamePageState extends State<MathGamePage> {
     );
   }
 
-  // Maneja la respuesta del niño y gestiona los 3 segundos de espera
   void _handleAnswer(BuildContext context, int selected, int correct) async {
     setState(() {
       _lastSelected = selected;
@@ -177,10 +177,8 @@ class _MathGamePageState extends State<MathGamePage> {
       _feedbackMessage = (selected == correct) ? '¡GENIAL! 🌟' : '¡OH NO! ☁️';
     });
 
-    // Registra el acierto/fallo en el Cubit
     context.read<MathCubit>().checkAnswer(selected);
 
-    // Espera obligatoria de 3 segundos para que el niño vea el resultado
     await Future.delayed(const Duration(seconds: 1));
 
     if (mounted) {
@@ -189,7 +187,6 @@ class _MathGamePageState extends State<MathGamePage> {
         _lastSelected = null;
         _feedbackMessage = null;
       });
-      // Genera la siguiente pregunta después del tiempo de espera
       context.read<MathCubit>().generateQuestion(
         widget.operation, 
         widget.level, 
@@ -206,14 +203,13 @@ class _MathGamePageState extends State<MathGamePage> {
   }
 
   Widget _getOperatorIcon(MathOperation op) {
-    IconData icon;
     switch (op) {
-      case MathOperation.suma: icon = Icons.add; break;
-      case MathOperation.resta: icon = Icons.remove; break;
-      case MathOperation.multi: icon = Icons.close; break;
-      case MathOperation.div: icon = Icons.horizontal_rule; break;
-      default: icon = Icons.help_outline;
+      case MathOperation.suma: return const Icon(Icons.add, size: 40, color: Colors.black);
+      case MathOperation.resta: return const Icon(Icons.remove, size: 40, color: Colors.black);
+      case MathOperation.multi: return const Icon(Icons.close, size: 40, color: Colors.black);
+      case MathOperation.div: 
+        return const Text('÷', style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold, color: Colors.black));
+      default: return const Icon(Icons.help_outline, size: 40, color: Colors.black);
     }
-    return Icon(icon, size: 40, color: Colors.black);
   }
 }

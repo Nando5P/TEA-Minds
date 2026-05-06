@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'memory_cubit.dart';
 import '../../domain/entities/child_entity.dart';
-import '../../models/teaColors.dart';
-import '../../presentation/widgets/flip_card_widget.dart'; // Import actualizado
+import '../../core/theme/teaColors.dart';
+import '../../core/widgets/flip_card_widget.dart'; // Import actualizado
 
 class Game2Page extends StatelessWidget {
   final Child child;

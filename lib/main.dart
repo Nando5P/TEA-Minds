@@ -8,7 +8,7 @@ import 'package:tea_minds/domain/repositories/auth_repository.dart';
 import 'package:tea_minds/domain/repositories/child_repository.dart';
 
 // Capa de Datos (Implementaciones)
-import 'package:tea_minds/data/sources/remote/auth_service.dart';
+import 'package:tea_minds/data/sources/auth_service.dart';
 import 'package:tea_minds/data/repositories/auth_repository_impl.dart';
 import 'package:tea_minds/data/repositories/child_repository_impl.dart';
 
@@ -18,7 +18,7 @@ import 'package:tea_minds/presentation/blocs/child/child_cubit.dart';
 
 // UI y Colores
 import 'package:tea_minds/presentation/pages/auth_wrapper.dart';
-import 'package:tea_minds/models/teaColors.dart';
+import 'package:tea_minds/core/theme/teaColors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

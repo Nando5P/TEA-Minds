@@ -14,9 +14,9 @@ class AuthService {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      // Aquí gestionaremos los errores (email ya usado, password débil, etc.)
+      // Aquí capturamos el código técnico (ej: 'email-already-in-use')
       print("Error en registro: ${e.code}");
-      rethrow;
+      rethrow; // Lo relanzamos para que el Cubit/UI lo capture
     }
   }
 
@@ -36,5 +36,26 @@ class AuthService {
   // 4. Cerrar Sesión
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  // --- EL TRADUCTOR MÁGICO ---
+  // Este método estático te servirá en cualquier parte de la app
+  static String getFriendlyErrorMessage(String code) {
+    switch (code) {
+      case 'email-already-in-use':
+        return 'Este correo ya está registrado. ¡Prueba a iniciar sesión!';
+      case 'invalid-email':
+        return 'El formato del correo no es correcto.';
+      case 'weak-password':
+        return 'La contraseña es muy corta. Usa al menos 6 caracteres.';
+      case 'user-not-found':
+        return 'No existe ninguna cuenta con este correo.';
+      case 'wrong-password':
+        return 'La contraseña no es correcta.';
+      case 'network-request-failed':
+        return 'Parece que no tienes conexión a internet.';
+      default:
+        return 'Ups, algo ha fallado. Inténtalo de nuevo.';
+    }
   }
 }

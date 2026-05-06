@@ -14,7 +14,6 @@ class MathState {
   final int score;
   final bool? lastAnswerCorrect;
   
-  // Seguimiento detallado para el informe del tutor
   final int successes;
   final int failures;
   final DateTime startTime;
@@ -31,6 +30,32 @@ class MathState {
     required this.failures,
     required this.startTime,
   });
+
+  MathState copyWith({
+    int? numA,
+    int? numB,
+    MathOperation? currentOp,
+    List<int>? options,
+    int? correctAnswer,
+    int? score,
+    bool? lastAnswerCorrect,
+    int? successes,
+    int? failures,
+    DateTime? startTime,
+  }) {
+    return MathState(
+      numA: numA ?? this.numA,
+      numB: numB ?? this.numB,
+      currentOp: currentOp ?? this.currentOp,
+      options: options ?? this.options,
+      correctAnswer: correctAnswer ?? this.correctAnswer,
+      score: score ?? this.score,
+      lastAnswerCorrect: lastAnswerCorrect ?? this.lastAnswerCorrect,
+      successes: successes ?? this.successes,
+      failures: failures ?? this.failures,
+      startTime: startTime ?? this.startTime,
+    );
+  }
 }
 
 class MathCubit extends Cubit<MathState?> {
@@ -40,56 +65,62 @@ class MathCubit extends Cubit<MathState?> {
   MathCubit(this._repository) : super(null);
 
   void generateQuestion(MathOperation op, int level, {List<int>? selectedTables}) {
-    int a = 0, b = 0;
+    int a = 0, b = 0, result = 0;
     MathOperation activeOp = op;
 
-    // Recuperamos o inicializamos los contadores de la sesión actual
     final int currentSuccesses = state?.successes ?? 0;
     final int currentFailures = state?.failures ?? 0;
     final DateTime currentStartTime = state?.startTime ?? DateTime.now();
 
-    // Lógica para elegir operación en modos mixtos
+    // 1. Elección de operación (Evitamos el interrogante en modos mixtos)
     if (op == MathOperation.mixtaSumaResta) {
       activeOp = _random.nextBool() ? MathOperation.suma : MathOperation.resta;
     } else if (op == MathOperation.mixtaMultiDiv) {
       activeOp = _random.nextBool() ? MathOperation.multi : MathOperation.div;
     } else if (op == MathOperation.todas) {
-      activeOp = MathOperation.values[_random.nextInt(4)];
+      final possible = [MathOperation.suma, MathOperation.resta, MathOperation.multi, MathOperation.div];
+      activeOp = possible[_random.nextInt(possible.length)];
     }
 
-    // Configuración de números según nivel y operación activa
+    // 2. Generación de números (Evitando ceros)
+    int range = (level + 1) * 10;
+
     switch (activeOp) {
       case MathOperation.suma:
-        a = _random.nextInt(level * 10) + 1;
-        b = _random.nextInt(level * 10) + 1;
+        a = _random.nextInt(range) + 1;
+        b = _random.nextInt(range) + 1;
+        result = a + b;
         break;
       case MathOperation.resta:
-        a = _random.nextInt(level * 10) + 5;
-        b = _random.nextInt(a);
+        a = _random.nextInt(range) + 5;
+        b = _random.nextInt(a - 1) + 1; // b siempre menor que a y no cero
+        result = a - b;
         break;
       case MathOperation.multi:
         a = (selectedTables != null && selectedTables.isNotEmpty)
             ? selectedTables[_random.nextInt(selectedTables.length)]
-            : (_random.nextInt(10) + 1);
-        b = _random.nextInt(10) + 1;
+            : (_random.nextInt(9) + 1);
+        b = _random.nextInt(9) + 1;
+        result = a * b;
         break;
       case MathOperation.div:
+        // Generamos b y result primero para asegurar división exacta y no cero
         b = (selectedTables != null && selectedTables.isNotEmpty)
             ? selectedTables[_random.nextInt(selectedTables.length)]
-            : (_random.nextInt(9) + 2);
-        int multi = _random.nextInt(10) + 1;
-        a = b * multi;
+            : (_random.nextInt(8) + 2);
+        result = _random.nextInt(9) + 1;
+        a = b * result;
         break;
-      default: break;
+      default:
+        activeOp = MathOperation.suma;
+        a = 1; b = 1; result = 2;
     }
 
-    int result = _calculate(a, b, activeOp);
-    
-    // Generar opciones falsas coherentes
+    // 3. Generar opciones falsas
     Set<int> opts = {result};
     while (opts.length < 4) {
       int fake = result + (_random.nextInt(7) - 3);
-      if (fake >= 0 && fake != result) opts.add(fake);
+      if (fake >= 1 && fake != result) opts.add(fake);
     }
 
     emit(MathState(
@@ -105,41 +136,21 @@ class MathCubit extends Cubit<MathState?> {
     ));
   }
 
-  int _calculate(int a, int b, MathOperation op) {
-    if (op == MathOperation.suma) return a + b;
-    if (op == MathOperation.resta) return a - b;
-    if (op == MathOperation.multi) return a * b;
-    if (op == MathOperation.div) return a ~/ b;
-    return 0;
-  }
-
   void checkAnswer(int selected) {
     if (state == null) return;
     bool correct = selected == state!.correctAnswer;
     
-    emit(MathState(
-      numA: state!.numA,
-      numB: state!.numB,
-      currentOp: state!.currentOp,
-      options: state!.options,
-      correctAnswer: state!.correctAnswer,
+    emit(state!.copyWith(
       score: correct ? state!.score + 1 : state!.score,
       lastAnswerCorrect: correct,
-      // Actualizamos contadores para la estadística final
       successes: correct ? state!.successes + 1 : state!.successes,
       failures: correct ? state!.failures : state!.failures + 1,
-      startTime: state!.startTime,
     ));
   }
 
-  /// Guarda los resultados de la sesión en Firebase diferenciando por operación
   Future<void> finishGame(String childId) async {
     if (state == null) return;
-
     final duration = DateTime.now().difference(state!.startTime);
-    
-    // Creamos un ID de juego específico (ej. mates_suma, mates_multi)
-    // Esto permite al tutor ver en qué operación falla más el niño.
     final String specificGameId = 'mates_${state!.currentOp.name}';
 
     final session = GameSession(

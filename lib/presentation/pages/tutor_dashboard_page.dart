@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/child_entity.dart';
 import '../../domain/repositories/child_repository.dart';
-import '../../models/teaColors.dart'; // Mantengo tu nombre de archivo actual
+import '../../core/theme/teaColors.dart'; // Mantengo tu nombre de archivo actual
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 import '../blocs/child/child_cubit.dart';
