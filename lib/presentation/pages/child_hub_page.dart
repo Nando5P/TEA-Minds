@@ -13,7 +13,22 @@ class ChildHubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Extraemos el color para el fondo del círculo
     final Color chickColor = Color(int.parse(child.color.replaceFirst('#', '0xFF')));
+
+    // 2. Mapeo del color para encontrar la imagen correcta
+    final colorHex = child.color.toUpperCase();
+    String colorName = 'orange'; 
+
+    if (colorHex.contains('BBDEFB')) {
+      colorName = 'blue';
+    } else if (colorHex.contains('E1BEE7')) {
+      colorName = 'purple';
+    } else if (colorHex.contains('F8BBD0')) {
+      colorName = 'red'; 
+    } else if (colorHex.contains('C8E6C9') || colorHex.contains('A5D6A7')) {
+      colorName = 'green';
+    }
 
     return Scaffold(
       backgroundColor: TEAColors.background,
@@ -48,23 +63,29 @@ class ChildHubPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
 
-                  // Avatar del pollito
+                  // --- AVATAR CON FONDO TRANSLÚCIDO Y HALO SUAVE ---
                   Container(
                     width: 180,
                     height: 180,
                     decoration: BoxDecoration(
-                      color: chickColor,
+                      color: chickColor.withValues(alpha: 0.2), // Fondo translúcido al 20%
                       shape: BoxShape.circle,
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
+                        // Sombra tintada del mismo color para dar efecto de brillo suave
+                        BoxShadow(
+                          color: chickColor.withValues(alpha: 0.15), 
+                          blurRadius: 30, 
+                          offset: const Offset(0, 10),
+                        ),
                       ],
                     ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Text('🐤', style: TextStyle(fontSize: 90)),
-                        if (child.tieneGafas) const Text('👓', style: TextStyle(fontSize: 80)),
-                      ],
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/pollitos/$colorName.png',
+                        width: 140, 
+                        height: 140,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.egg, size: 100, color: Colors.amber),
+                      ),
                     ),
                   ),
                   
@@ -72,11 +93,11 @@ class ChildHubPage extends StatelessWidget {
 
                   // MENÚ DE JUEGOS EN FORMATO TRIÁNGULO
                   SizedBox(
-                    width: 260, // Forzamos que solo quepan 2 por fila
+                    width: 260, 
                     child: Wrap(
                       spacing: 20,
                       runSpacing: 20,
-                      alignment: WrapAlignment.center, // Centra el botón suelto abajo
+                      alignment: WrapAlignment.center, 
                       children: [
                         _buildGameButton(
                           context, 

@@ -16,7 +16,7 @@ class TutorDashboardPage extends StatelessWidget {
   const TutorDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext mainContext) { // <--- 1. RENOMBRAMOS A mainContext
+  Widget build(BuildContext mainContext) { 
     final authState = mainContext.read<AuthCubit>().state;
     final String tutorId = (authState is AuthAuthenticated) ? authState.user.uid : '';
 
@@ -58,7 +58,6 @@ class TutorDashboardPage extends StatelessWidget {
             itemCount: children.length,
             itemBuilder: (gridContext, index) {
               final child = children[index];
-              // <--- 2. LA CLAVE: Pasamos el mainContext que nunca muere
               return _buildChildCard(mainContext, child, tutorId); 
             },
           );
@@ -77,7 +76,22 @@ class TutorDashboardPage extends StatelessWidget {
   }
 
   Widget _buildChildCard(BuildContext context, Child child, String tutorId) {
-    final Color cardColor = Color(int.parse(child.color.replaceFirst('#', '0xFF')));
+    // 1. Mapeo de colores (esto depende de cómo guardes el color en Firestore)
+    // Extraemos el valor hexadecimal y lo pasamos a mayúsculas
+    final colorHex = child.color.toUpperCase();
+    String colorName = 'orange'; // Imagen por defecto
+
+    // Mapeo básico basándonos en los HEX pastel de CreateChildDialog
+    if (colorHex.contains('BBDEFB')) {
+      colorName = 'blue';
+    } else if (colorHex.contains('E1BEE7')) {
+      colorName = 'purple';
+    } else if (colorHex.contains('F8BBD0')) {
+      colorName = 'red'; // Usamos red.png para el rosa pastel
+    } else if (colorHex.contains('C8E6C9') || colorHex.contains('A5D6A7')) {
+      // Ajusta estos valores HEX por los exactos de TEAColors.greenPastel si no coincide
+      colorName = 'green';
+    }
 
     return GestureDetector(
       onTap: () => _showActionMenu(context, child, tutorId), 
@@ -96,22 +110,13 @@ class TutorDashboardPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: cardColor.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                Text(
-                  child.tieneGafas ? '🐥👓' : '🐥',
-                  style: const TextStyle(fontSize: 45),
-                ),
-              ],
+            // --- AQUÍ USAMOS TUS IMÁGENES REALES ---
+            Image.asset(
+              'assets/images/pollitos/$colorName.png',
+              width: 80,
+              height: 80,
+              // Si falla la carga de la imagen, mostramos un huevo amarillo de seguridad
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.egg, size: 80, color: Colors.amber),
             ),
             const SizedBox(height: 15),
             Text(
@@ -234,10 +239,12 @@ class TutorDashboardPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(dialogContext); // Cerramos el cuadro de diálogo
+              Navigator.pop(dialogContext); // Cerramos el diálogo flotante
               
               // Como estamos usando safeContext (mainContext), no importa que se borre la tarjeta
               TEASnackBars.show(safeContext, message: 'Adiós, ${child.nombre} 🐣', isError: false);
+              
+              // Disparamos la lógica de Firebase
               safeContext.read<ChildCubit>().removeChild(child, tutorId);
             },
             style: ElevatedButton.styleFrom(

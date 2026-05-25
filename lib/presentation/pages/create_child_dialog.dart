@@ -16,12 +16,11 @@ class CreateChildDialog extends StatefulWidget {
 
 class _CreateChildDialogState extends State<CreateChildDialog> {
   final _nameController = TextEditingController();
-  bool _tieneGafas = false;
+  final _idController = TextEditingController();
   Color _selectedColor = TEAColors.chickyYellow;
 
-  final _idController = TextEditingController();
-
   final List<Color> _palette = [
+    TEAColors.chickyYellow,
     const Color(0xFFF8BBD0),
     const Color(0xFFBBDEFB),
     TEAColors.greenPastel,
@@ -49,7 +48,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
         nombre: _nameController.text.trim(),
         tutorIds: [authState.user.uid], 
         color: '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
-        tieneGafas: _tieneGafas,
+        tieneGafas: false, // Mantenemos el modelo pero forzado a false
       );
 
       context.read<ChildCubit>().addChild(newChild);
@@ -88,15 +87,12 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
       child: DefaultTabController(
         length: 2,
         child: Container(
-          constraints: const BoxConstraints(maxHeight: 550),
+          constraints: const BoxConstraints(maxHeight: 450), // Un poco más pequeño al quitar las gafas
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                ),
                 child: Column(
                   children: [
                     const Text('Añadir Pollito', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
@@ -107,8 +103,8 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
                       indicatorColor: TEAColors.bluePastel,
                       indicatorWeight: 3,
                       tabs: const [
-                        Tab(text: 'Crear de 0', icon: Icon(Icons.egg_outlined)),
-                        Tab(text: 'Vincular por ID', icon: Icon(Icons.link)),
+                        Tab(text: 'Crear', icon: Icon(Icons.egg_outlined)),
+                        Tab(text: 'Vincular', icon: Icon(Icons.link)),
                       ],
                     ),
                   ],
@@ -117,8 +113,8 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
               Expanded(
                 child: TabBarView(
                   children: [
-                    _buildCreateTab(context),
-                    _buildLinkTab(context),
+                    _buildCreateTab(),
+                    _buildLinkTab(),
                   ],
                 ),
               ),
@@ -129,11 +125,10 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
     );
   }
 
-  Widget _buildCreateTab(BuildContext context) {
+  Widget _buildCreateTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
@@ -167,13 +162,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 16),
-          SwitchListTile(
-            title: const Text('¿Lleva gafas?'),
-            value: _tieneGafas,
-            onChanged: (val) => setState(() => _tieneGafas = val),
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -195,7 +184,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
     );
   }
 
-  Widget _buildLinkTab(BuildContext context) {
+  Widget _buildLinkTab() {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -204,7 +193,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
           const Icon(Icons.diversity_3, size: 60, color: TEAColors.chickyYellow),
           const SizedBox(height: 20),
           const Text(
-            'Si otro tutor ya creó el perfil del niño, pega aquí su ID para compartir los datos.',
+            'Pega aquí el ID para compartir los datos del perfil.',
             textAlign: TextAlign.center,
             style: TextStyle(color: TEAColors.textSecondary),
           ),
