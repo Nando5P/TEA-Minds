@@ -15,7 +15,7 @@ class ChildRepositoryImpl implements ChildRepository {
   Stream<List<Child>> getChildrenByTutor(String tutorId) {
     return _firestore
         .collection('children')
-        .where('tutor_id', isEqualTo: tutorId)
+        .where('tutor_ids', arrayContains: tutorId)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
               final data = doc.data();
@@ -24,7 +24,7 @@ class ChildRepositoryImpl implements ChildRepository {
                 nombre: data['nombre'] ?? '',
                 color: data['color'] ?? '#FFFFFF',
                 tieneGafas: data['tiene_gafas'] ?? false,
-                tutorId: data['tutor_id'] ?? '', // Relación con el tutor
+                tutorIds: List<String>.from(data['tutor_ids'] ?? []),
                 recordEncaje: data['record_encaje'] ?? 0,
                 recordParejas: data['record_parejas'] ?? 0,
               );
@@ -38,13 +38,48 @@ class ChildRepositoryImpl implements ChildRepository {
         'nombre': child.nombre,
         'color': child.color,
         'tiene_gafas': child.tieneGafas,
-        'tutor_id': child.tutorId, // Guardamos la vinculación
+        'tutor_ids': child.tutorIds,
         'record_encaje': 0,
         'record_parejas': 0,
         'created_at': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       throw Exception('Error al crear el perfil del niño: $e');
+    }
+  }
+
+  @override
+  Future<void> linkChildWithTutor(String childId, String tutorId) async {
+    try {
+      await _firestore.collection('children').doc(childId).update({
+        'tutor_ids': FieldValue.arrayUnion([tutorId]),
+      });
+    } catch (e) {
+      throw Exception('No se ha encontrado ningún pollito con ese ID.');
+    }
+  }
+
+  @override
+  Future<void> removeChild(String childId, String tutorId, List<String> currentTutorIds) async {
+    try {
+      if (currentTutorIds.length > 1) {
+        // CASO 1: Hay más tutores. Solo me desvinculo usando arrayRemove.
+        await _firestore.collection('children').doc(childId).update({
+          'tutor_ids': FieldValue.arrayRemove([tutorId]),
+        });
+      } else {
+        // CASO 2: Soy el único tutor. Borro al pollito de la base de datos por completo.
+        await _firestore.collection('children').doc(childId).delete();
+        
+        // LIMPIEZA EXTRA: Buscamos todas sus partidas guardadas y las borramos
+        final sessions = await _firestore.collection('sessions')
+            .where('child_id', isEqualTo: childId).get();
+        for (var doc in sessions.docs) {
+          await doc.reference.delete();
+        }
+      }
+    } catch (e) {
+      throw Exception('Error al borrar el pollito: $e');
     }
   }
 
@@ -107,7 +142,7 @@ class ChildRepositoryImpl implements ChildRepository {
     try {
       await _firestore.collection('sessions').add({
         'child_id': session.childId,
-        'game_id': session.gameId, // 'puzzle', 'memoria', 'mates'
+        'game_id': session.gameId,
         'date': Timestamp.fromDate(session.date),
         'total_attempts': session.totalAttempts,
         'successes': session.successes,

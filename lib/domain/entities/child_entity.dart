@@ -1,9 +1,10 @@
+
 class Child {
   final String id;
   final String nombre;
   final String color;
   final bool tieneGafas;
-  final String tutorId; // Campo obligatorio para la relación
+  final List<String> tutorIds;
   final int recordEncaje;
   final int recordParejas;
 
@@ -12,7 +13,7 @@ class Child {
     required this.nombre,
     required this.color,
     required this.tieneGafas,
-    required this.tutorId,
+    required this.tutorIds,
     this.recordEncaje = 0,
     this.recordParejas = 0,
   });

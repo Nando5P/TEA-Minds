@@ -8,12 +8,10 @@ class ChildCubit extends Cubit<ChildState> {
 
   ChildCubit(this._repository) : super(ChildState());
 
-  // --- LA FUNCIÓN QUE FALTABA ---
   void selectChild(Child child) {
     emit(state.copyWith(selectedChild: child));
   }
 
-  // Cargar lista de niños (opcional si usas Stream directamente, pero útil para el estado global)
   void loadChildren(String tutorId) {
     emit(state.copyWith(isLoading: true));
     _repository.getChildrenByTutor(tutorId).listen(
@@ -22,18 +20,32 @@ class ChildCubit extends Cubit<ChildState> {
     );
   }
 
-  // Añadir nuevo niño
   Future<void> addChild(Child child) async {
     try {
       await _repository.createChild(child);
-      // No hace falta emitir nada aquí si getChildrenByTutor es un Stream, 
-      // ya que se actualizará solo.
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
+  }
+
+  Future<void> linkChild(String childId, String tutorId) async {
+    try {
+      await _repository.linkChildWithTutor(childId, tutorId);
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+      throw Exception(e); 
+    }
+  }
+
+  // --- NUEVA FUNCIÓN PARA BORRAR ---
+  Future<void> removeChild(Child child, String tutorId) async {
+    try {
+      await _repository.removeChild(child.id, tutorId, child.tutorIds);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     }
   }
   
-  // Limpiar selección (por si vuelves al dashboard)
   void clearSelection() {
     emit(state.copyWith(selectedChild: null));
   }

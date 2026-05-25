@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/child_model.dart';
 import '../../core/theme/teaColors.dart';
+import '../../core/widgets/tea_snackbars.dart';
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 import '../blocs/child/child_cubit.dart';
@@ -18,37 +19,66 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
   bool _tieneGafas = false;
   Color _selectedColor = TEAColors.chickyYellow;
 
+  final _idController = TextEditingController();
+
   final List<Color> _palette = [
     TEAColors.chickyYellow,
-    const Color(0xFFF8BBD0), // Rosa
-    const Color(0xFFBBDEFB), // Azul
+    const Color(0xFFF8BBD0),
+    const Color(0xFFBBDEFB),
     TEAColors.greenPastel,
-    const Color(0xFFFFE0B2), // Naranja
-    const Color(0xFFE1BEE7), // Lavanda
+    const Color(0xFFFFE0B2),
+    const Color(0xFFE1BEE7),
   ];
 
   @override
   void dispose() {
     _nameController.dispose();
+    _idController.dispose();
     super.dispose();
   }
 
-  void _onSave() {
-    if (_nameController.text.trim().isEmpty) return;
+  void _onCreate() {
+    if (_nameController.text.trim().isEmpty) {
+      TEASnackBars.show(context, message: 'Ponle un nombre al pollito', isError: true);
+      return;
+    }
 
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthAuthenticated) {
-      // Creamos el modelo ajustado a la nueva estructura
       final newChild = ChildModel(
-        id: '', // Firestore generará el ID automáticamente
+        id: '', 
         nombre: _nameController.text.trim(),
-        tutorId: authState.user.uid,
+        tutorIds: [authState.user.uid], 
         color: '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
         tieneGafas: _tieneGafas,
       );
 
       context.read<ChildCubit>().addChild(newChild);
       Navigator.pop(context);
+      TEASnackBars.show(context, message: '¡Pollito creado con éxito! 🐣', isError: false);
+    }
+  }
+
+  Future<void> _onLink() async {
+    final childId = _idController.text.trim();
+    if (childId.isEmpty) {
+      TEASnackBars.show(context, message: 'Introduce un ID válido', isError: true);
+      return;
+    }
+
+    final authState = context.read<AuthCubit>().state;
+    if (authState is AuthAuthenticated) {
+      try {
+        await context.read<ChildCubit>().linkChild(childId, authState.user.uid);
+        if (mounted) {
+          Navigator.pop(context);
+          TEASnackBars.show(context, message: '¡Pollito vinculado con éxito! 🎉', isError: false);
+        }
+      } catch (e) {
+        if (mounted) {
+          TEASnackBars.show(context, message: 'No se encontró ningún pollito con ese ID', isError: true);
+        }
+      }
     }
   }
 
@@ -56,76 +86,156 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Nuevo Pollito',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nombre del niño',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon: const Icon(Icons.person_outline),
+      child: DefaultTabController(
+        length: 2,
+        child: Container(
+          constraints: const BoxConstraints(maxHeight: 550),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: Column(
+                  children: [
+                    const Text('Añadir Pollito', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 15),
+                    TabBar(
+                      labelColor: TEAColors.textPrimary,
+                      unselectedLabelColor: TEAColors.textSecondary,
+                      indicatorColor: TEAColors.bluePastel,
+                      indicatorWeight: 3,
+                      tabs: const [
+                        Tab(text: 'Crear de 0', icon: Icon(Icons.egg_outlined)),
+                        Tab(text: 'Vincular por ID', icon: Icon(Icons.link)),
+                      ],
+                    ),
+                  ],
+                ),
               ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildCreateTab(context),
+                    _buildLinkTab(context),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCreateTab(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _nameController,
+            decoration: InputDecoration(
+              labelText: 'Nombre del niño',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              prefixIcon: const Icon(Icons.person_outline),
             ),
-            const SizedBox(height: 24),
-            const Text('Elige un color:', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              children: _palette.map((color) {
-                return GestureDetector(
-                  onTap: () => setState(() => _selectedColor = color),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: _selectedColor == color ? Colors.black : Colors.transparent,
-                        width: 2,
-                      ),
+          ),
+          const SizedBox(height: 24),
+          const Text('Elige un color:', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            children: _palette.map((color) {
+              return GestureDetector(
+                onTap: () => setState(() => _selectedColor = color),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _selectedColor == color ? Colors.black : Colors.transparent,
+                      width: 2,
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 24),
-            SwitchListTile(
-              title: const Text('¿Lleva gafas?'),
-              value: _tieneGafas,
-              // Usamos thumbColor en lugar de activeColor para evitar deprecaciones si fuera necesario
-              onChanged: (val) => setState(() => _tieneGafas = val),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
                 ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: _onSave,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: TEAColors.bluePastel,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text('Guardar'),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            title: const Text('¿Lleva gafas?'),
+            value: _tieneGafas,
+            onChanged: (val) => setState(() => _tieneGafas = val),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: _onCreate,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: TEAColors.bluePastel,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-              ],
+                child: const Text('Crear'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLinkTab(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.diversity_3, size: 60, color: TEAColors.chickyYellow),
+          const SizedBox(height: 20),
+          const Text(
+            'Si otro tutor ya creó el perfil del niño, pega aquí su ID para compartir los datos.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: TEAColors.textSecondary),
+          ),
+          const SizedBox(height: 24),
+          TextField(
+            controller: _idController,
+            decoration: InputDecoration(
+              labelText: 'Pega el ID aquí',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              prefixIcon: const Icon(Icons.paste),
             ),
-          ],
-        ),
+          ),
+          const Spacer(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: _onLink,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: TEAColors.greenPastel,
+                  foregroundColor: TEAColors.textPrimary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Vincular', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
