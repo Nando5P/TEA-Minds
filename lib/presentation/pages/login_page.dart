@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/teaColors.dart';
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
-import 'register_page.dart'; // Importamos la página de registro para navegar
+import 'register_page.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,9 +36,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // --- HEADER (Logo y Título) ---
+                  // --- HEADER (Imagen de los pollitos en la biblioteca) ---
                   _buildHeader(),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 32),
                   
                   // --- FORMULARIO (Caja Blanca) ---
                   _buildLoginForm(context),
@@ -74,28 +74,46 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(32),
-          decoration: const BoxDecoration(
-            color: TEAColors.chickyYellow,
-            shape: BoxShape.circle,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
           ),
-          child: const Text('🐤', style: TextStyle(fontSize: 64)),
-        ),
-        const SizedBox(height: 24),
-        const Text(
-          'TEA-Minds',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w500,
-            color: TEAColors.textPrimary,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Image.asset(
+              'assets/images/login_header.png',
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Intervención Terapéutica Inclusiva',
-          style: TextStyle(fontSize: 18, color: TEAColors.textSecondary),
+        const SizedBox(height: 16),
+        RichText(
           textAlign: TextAlign.center,
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+              color: TEAColors.textPrimary,
+            ),
+            children: [
+              TextSpan(text: 'TEA-'),
+              TextSpan(
+                text: 'Minds',
+                style: TextStyle(color: TEAColors.bluePastel),
+              ),
+            ],
+          ),
         ),
+      
       ],
     );
   }
@@ -107,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -117,7 +135,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         children: [
           const Text(
-            'Acceso para Adultos',
+            'Acceso a tu cuenta',
             style: TextStyle(
               fontSize: 20, 
               fontWeight: FontWeight.w500, 

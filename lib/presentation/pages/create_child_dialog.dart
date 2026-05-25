@@ -22,7 +22,6 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
   final _idController = TextEditingController();
 
   final List<Color> _palette = [
-    TEAColors.chickyYellow,
     const Color(0xFFF8BBD0),
     const Color(0xFFBBDEFB),
     TEAColors.greenPastel,
