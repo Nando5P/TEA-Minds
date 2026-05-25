@@ -96,14 +96,14 @@ class TutorStatsPage extends StatelessWidget {
                   PieChartSectionData(
                     value: successes.toDouble(),
                     title: '${((successes / total) * 100).toInt()}%',
-                    color: const Color(0xFFA5D6A7), // Verde pastel
+                    color: TEAColors.successPastel, // Verde pastel
                     radius: 50,
                     titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   PieChartSectionData(
                     value: failures.toDouble(),
                     title: '${((failures / total) * 100).toInt()}%',
-                    color: const Color(0xFFEF9A9A), // Rojo pastel
+                    color: TEAColors.errorPastel, // Rojo pastel
                     radius: 50,
                     titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                   ),
@@ -116,9 +116,9 @@ class TutorStatsPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _LegendItem(color: Color(0xFFA5D6A7), text: 'Aciertos'),
+              _LegendItem(color: TEAColors.successPastel, text: 'Aciertos'),
               SizedBox(height: 10),
-              _LegendItem(color: Color(0xFFEF9A9A), text: 'Fallos'),
+              _LegendItem(color: TEAColors.errorPastel, text: 'Fallos'),
             ],
           )
         ],
@@ -161,7 +161,7 @@ class TutorStatsPage extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: acc > 70 ? const Color(0xFFA5D6A7).withValues(alpha: 0.3) : const Color(0xFFEF9A9A).withValues(alpha: 0.3),
+              backgroundColor: acc > 70 ? TEAColors.successPastel.withValues(alpha: 0.3) : TEAColors.errorPastel.withValues(alpha: 0.3),
               child: Icon(Icons.history, color: acc > 70 ? Colors.green : Colors.red),
             ),
             title: Text(session.gameId.replaceAll('_', ' ').toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)),

@@ -201,7 +201,7 @@ class TutorDashboardPage extends StatelessWidget {
               const Divider(),
               ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFEF9A9A),
+                  backgroundColor: TEAColors.errorPastel,
                   child: Icon(Icons.delete_outline, color: Colors.white),
                 ),
                 title: const Text('Borrar pollito', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
@@ -248,7 +248,7 @@ class TutorDashboardPage extends StatelessWidget {
               safeContext.read<ChildCubit>().removeChild(child, tutorId);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFEF9A9A),
+              backgroundColor: TEAColors.errorPastel,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

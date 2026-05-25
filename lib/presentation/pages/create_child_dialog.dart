@@ -20,11 +20,11 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
   Color _selectedColor = TEAColors.chickyYellow;
 
   final List<Color> _palette = [
-    const Color(0xFFF8BBD0),
-    const Color(0xFFBBDEFB),
+    TEAColors.pinkPastel,
+    TEAColors.lightBluePastel,
     TEAColors.greenPastel,
-    const Color(0xFFFFE0B2),
-    const Color(0xFFE1BEE7),
+    TEAColors.peachPastel,
+    TEAColors.lavenderPastel,
   ];
 
   @override

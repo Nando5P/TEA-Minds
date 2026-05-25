@@ -38,7 +38,7 @@ class _MathMenuPageState extends State<MathMenuPage> {
                 const SizedBox(width: 10),
                 _buildLevelBtn(2, 'Medio', TEAColors.bluePastel),
                 const SizedBox(width: 10),
-                _buildLevelBtn(3, 'Difícil', Colors.orangeAccent),
+                _buildLevelBtn(3, 'Difícil', TEAColors.orangeAccent),
               ],
             ),
             const SizedBox(height: 40),

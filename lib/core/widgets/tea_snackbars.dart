@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/teaColors.dart';
 
 class TEASnackBars {
   /// Muestra un aviso personalizado en la parte inferior de la pantalla
@@ -9,8 +10,8 @@ class TEASnackBars {
   }) {
     // Colores basados en tu paleta de los juegos
     final Color backgroundColor = isError 
-        ? const Color(0xFFEF9A9A) // Rojo pastel (¡OH NO!)
-        : const Color(0xFFA5D6A7); // Verde pastel (¡GENIAL!)
+      ? TEAColors.errorPastel // Rojo pastel (¡OH NO!)
+      : TEAColors.successPastel; // Verde pastel (¡GENIAL!)
 
     final IconData icon = isError ? Icons.info_outline : Icons.check_circle_outline;
 

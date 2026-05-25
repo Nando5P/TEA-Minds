@@ -63,7 +63,7 @@ class TeaMindsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: const Color(0xFFC8E6C9),
+        colorSchemeSeed: TEAColors.seedGreen,
         brightness: Brightness.light,
         scaffoldBackgroundColor: TEAColors.background,
       ),

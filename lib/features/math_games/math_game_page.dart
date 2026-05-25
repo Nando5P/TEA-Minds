@@ -28,9 +28,6 @@ class _MathGamePageState extends State<MathGamePage> {
   bool _isShowingFeedback = false;
   String? _feedbackMessage;
 
-  static const Color greenPastel = Color(0xFFA5D6A7);
-  static const Color redPastel = Color(0xFFEF9A9A);
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -137,9 +134,9 @@ class _MathGamePageState extends State<MathGamePage> {
 
                         if (_isShowingFeedback) {
                           if (option == state.correctAnswer) {
-                            btnColor = greenPastel;
+                            btnColor = TEAColors.successPastel;
                           } else if (option == _lastSelected) {
-                            btnColor = redPastel;
+                            btnColor = TEAColors.errorPastel;
                           }
                         }
 
