@@ -76,14 +76,21 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildHeader() {
     return Column(
-      children: const [
-        Text('🐣', style: TextStyle(fontSize: 64)),
-        SizedBox(height: 16),
-        Text(
+      children: [
+        // --- CAMBIO AQUÍ: EMOJI POR IMAGEN ---
+        Image.asset(
+          'assets/images/pollitos/orange.png', // He puesto el naranja, cámbialo si quieres otro
+          height: 100, // Tamaño similar al tamaño del texto original
+          width: 100,
+          // Fallback por seguridad si no carga la imagen
+          errorBuilder: (context, error, stackTrace) => const Text('🐣', style: TextStyle(fontSize: 64)),
+        ),
+        const SizedBox(height: 16),
+        const Text(
           'Crear Cuenta',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: TEAColors.textPrimary),
         ),
-        Text(
+        const Text(
           'Únete a la comunidad TEA-Minds',
           style: TextStyle(fontSize: 16, color: TEAColors.textSecondary),
         ),
@@ -115,7 +122,6 @@ class _RegisterPageState extends State<RegisterPage> {
           _buildRoleSelector(),
           const SizedBox(height: 32),
 
-          // --- AQUÍ ESTÁ EL CAMBIO CRÍTICO ---
           BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthAuthenticated) {
