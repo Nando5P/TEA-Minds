@@ -1,12 +1,13 @@
-# TEA-Minds: Neuro-estimulación con Pollitos 🐥
+**TEA-Minds** es una aplicación multiplataforma diseñada para la estimulación de procesos cognitivos en niños con Trastorno del Espectro Autista (TEA). El proyecto ofrece un entorno seguro donde **Tutores** y **Especialistas** pueden gestionar perfiles infantiles y monitorizar su progreso a través de actividades gamificadas y adaptativas.
 
-**TEA-Minds** es una aplicación multiplataforma diseñada para la estimulación de procesos cognitivos en niños con Trastorno del Espectro Autista (TEA). El proyecto ofrece un entorno seguro donde **Tutores** y **Especialistas** pueden gestionar perfiles infantiles y monitorizar su progreso a través de actividades gamificadas.
-
-## 🚀 Estado del Desarrollo (Marzo 2026)
-Actualmente, el proyecto se encuentra en la **Fase de Gestión de Perfiles y Persistencia**. Los hitos alcanzados son:
-* **Infraestructura**: Conexión con Firebase y arquitectura base configurada.
-* **Autenticación**: Sistema de registro y login funcional por roles (Tutor/Especialista).
-* **Gestión de Niños**: Dashboard operativo con creación y visualización de "pollitos" en tiempo real.
+## 🚀 Estado del Desarrollo (Mayo 2026)
+Actualmente, el proyecto se encuentra en la **Fase de Desarrollo de Juegos, Interfaz Accesible y Analítica**. Los hitos alcanzados son:
+* **Infraestructura y Autenticación**: Conexión con Firebase, registro por roles (Tutor/Especialista) y PIN de seguridad parental.
+* **Gestión de Perfiles**: Dashboard operativo con creación, desvinculación y visualización de "pollitos" en tiempo real. Los avatares se generan dinámicamente mapeando el color hexadecimal seleccionado a *assets* gráficos locales con efectos visuales optimizados (halos translúcidos).
+* **Estimulación Matemática**: Motor de cálculo mental adaptativo interactivo. Incorpora herramientas pedagógicas avanzadas activables en tiempo real mediante interruptores (*toggles*):
+  * **Ayuda por colores:** Diferenciación visual automática de unidades (azul) y decenas/centenas (rojo) mediante parsing de texto.
+  * **Regletas Cuisenaire:** Renderizado algorítmico de bloques matemáticos apilables de forma responsiva (`Wrap` y `ConstrainedBox`), proporcionales en tamaño y con colores estandarizados internacionalmente.
+* **Minimalismo Sensorial**: UI/UX rediseñada sin sobrecargas visuales ni ruidos cognitivos, implementando iconografía nativa del sistema mediante `flutter_launcher_icons`.
 
 🔗 **Repositorio oficial:** [https://github.com/Nando5P/TEA-Minds.git](https://github.com/Nando5P/TEA-Minds.git)
 
@@ -15,11 +16,11 @@ Actualmente, el proyecto se encuentra en la **Fase de Gestión de Perfiles y Per
 ## 🏗️ Arquitectura del Software
 Se ha implementado una **Arquitectura Limpia (Clean Architecture)** para asegurar un código profesional, escalable y fácil de mantener:
 
-1.  **DOMAIN**: El núcleo de la lógica. Contiene las **Entities** (clases puras como `UserApp` y `Child`) y las interfaces de los repositorios.
-2.  **DATA**: Implementación técnica de **Firebase** (Firestore/Auth), repositorios reales y modelos con lógica de mapeo (`fromMap`/`toMap`).
-3.  **PRESENTATION**: Gestión de estado mediante el patrón **BLoC/Cubit** y una interfaz diseñada para evitar ruidos visuales y priorizar la accesibilidad cognitiva.
+1. **DOMAIN**: El núcleo de la lógica pura. Contiene las **Entities** (clases puras como `UserApp` y `Child`) y las interfaces de los repositorios.
+2. **DATA**: Implementación técnica de **Firebase** (Firestore/Auth), repositorios reales y modelos con lógica de mapeo y serialización (`fromJson`/`toJson` y factorías).
+3. **PRESENTATION**: Gestión de estado reactiva mediante el patrón **BLoC/Cubit** e interfaz de usuario diseñada para evitar sobrecargas sensoriales, aislando completamente la lógica de negocio de la vista.
 
-### 📂 Estructura de Carpetas Actual (`lib/`)
+### 📂 Estructura de Carpetas (`lib/`)
 ```text
 lib/
 ├── core/             # Configuración base y utilidades compartidas.
@@ -27,47 +28,53 @@ lib/
 ├── domain/           # Capa de dominio (Entities y Repositories Interface).
 ├── models/           # Constantes visuales globales (TEAColors.dart).
 ├── presentation/     # Capa visual (Blocs y Pages).
-└── main.dart         # Punto de
+└── main.dart         # Punto de entrada de la aplicación.
 ````
 ---
 
+¡Aquí tienes la sección exacta, Nando! Lista para copiar y pegar:
+
+Markdown
 ## 📊 Modelo de Datos (Cloud Firestore)
 
-### Colección: `users`
-* **ID**: `UID` generado por Firebase Auth.
+La base de datos NoSQL se estructura en tres colecciones principales que permiten una sincronización en tiempo real y un diseño jerárquico flexible y escalable (Schemaless):
+
+### Colección: `users` (Tutores / Especialistas)
+* **ID**: `UID` único generado por Firebase Auth.
 * **Campos**: 
     * `nombreCompleto`: (string) Nombre del tutor o especialista.
     * `email`: (string) Correo electrónico de acceso.
     * `rol`: (string) Rol asignado (Tutor/Especialista).
-    * `pinSeguridad`: (string) PIN de 4 dígitos para control parental.
+    * `pinSeguridad`: (string) PIN de 4 dígitos para control parental y bloqueo de salida.
 
-### Colección: `children`
+### Colección: `children` (Perfiles Infantiles)
 * **ID**: Automático generado por Firestore.
 * **Campos**:
     * `nombre`: (string) Nombre del niño/a.
-    * `tutor_id`: (string) UID del tutor que creó el perfil.
-    * `color`: (string) Código Hexadecimal para el avatar personalizado.
-    * `tiene_gafas`: **(bool)** Atributo visual para el personaje (pollito).
+    * `tutor_ids`: (array de strings) Lista de UIDs de los tutores asignados (Relación M:N).
+    * `color`: (string) Código Hexadecimal (ej. `#f8bbd0`) para el avatar y la UI personalizada.
+    * `tiene_gafas`: (bool) Atributo visual latente para el personaje, preparado para futura personalización.
     * `created_at`: (timestamp) Fecha de creación para ordenación en el Dashboard.
 
----
-
-## 📝 Metodología de Documentación
-El proyecto sigue un proceso de documentación continua:
-
-* **Memoria Técnica**: Actualización periódica de objetivos, planificación y presupuesto en la documentación oficial del módulo.
-* **Comentarios de Código**: Uso de estándares de Dart para documentar la lógica de negocio y facilitar el mantenimiento.
-* **Control de Versiones**: Gestión de cambios y evolución del software mediante commits descriptivos en GitHub.
-* **Asistencia Técnica**: Validación de patrones de diseño y depuración mediante herramientas de IA avanzada.
+### Colección: `sessions` (Motor Analítico)
+* **ID**: Automático generado por Firestore.
+* **Campos**:
+    * `child_id`: (string) Referencia al perfil del niño.
+    * `game_type`: (string) Tipo de actividad (ej. "matematicas").
+    * `aciertos`: (number) Cantidad de respuestas correctas.
+    * `fallos`: (number) Cantidad de respuestas incorrectas.
+    * `timestamp`: (timestamp) Fecha y hora exacta de la actividad para gráficas de evolución pedagógica.
 
 ---
 
 ## 🛠️ Stack Tecnológico
-* **Framework**: Flutter (Dart).
-* **Backend**: Firebase (Auth & Firestore).
+* **Framework**: Flutter (Dart) con compilación nativa ARM.
+* **Backend**: Firebase (Auth & Cloud Firestore Serverless).
 * **Gestión de Estado**: BLoC / Cubit.
-* **Entorno**: VS Code.
+* **Diseño y Recursos**: Iconografía nativa automatizada vía `flutter_launcher_icons`.
+* **Entorno**: Visual Studio Code.
 
 ---
 **Alumno**: Fernando Parga Fernández  
-**Centro**: I.E.S. Fernando Wirtz Suárez
+**Centro**: I.E.S. Fernando Wirtz Suárez  
+**Curso**: DAM2 - 2025-2026
