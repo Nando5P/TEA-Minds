@@ -77,10 +77,9 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        // --- CAMBIO AQUÍ: EMOJI POR IMAGEN ---
         Image.asset(
-          'assets/images/pollitos/orange.png', // He puesto el naranja, cámbialo si quieres otro
-          height: 100, // Tamaño similar al tamaño del texto original
+          'assets/images/pollitos/orange.png', 
+          height: 100, 
           width: 100,
           // Fallback por seguridad si no carga la imagen
           errorBuilder: (context, error, stackTrace) => const Text('🐣', style: TextStyle(fontSize: 64)),
@@ -131,10 +130,9 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               
               if (state is AuthError) {
-                // 1. Aplicamos la traducción (state.message ahora es el código "email-already-in-use")
+                // 1. Aplicamos la traducción ( "email-already-in-use")
                 final String mensajeTraducido = AuthService.getFriendlyErrorMessage(state.message);
                 
-                // 2. Llamamos a TU WIDGET (el que tiene el diseño rojo pastel)
                 TEASnackBars.show(context, message: mensajeTraducido, isError: true);
               }
             },
@@ -161,7 +159,6 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  // Los métodos auxiliares se mantienen igual pero con retoques de diseño
   Widget _buildRoleSelector() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

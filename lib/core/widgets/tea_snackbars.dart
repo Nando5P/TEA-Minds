@@ -8,7 +8,7 @@ class TEASnackBars {
     required String message,
     bool isError = true,
   }) {
-    // Colores basados en tu paleta de los juegos
+    // Colores basados en las paleta de los juegos
     final Color backgroundColor = isError 
       ? TEAColors.errorPastel // Rojo pastel (¡OH NO!)
       : TEAColors.successPastel; // Verde pastel (¡GENIAL!)

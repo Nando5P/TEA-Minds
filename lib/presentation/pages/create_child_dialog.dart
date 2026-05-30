@@ -47,7 +47,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
         nombre: _nameController.text.trim(),
         tutorIds: [authState.user.uid], 
         color: '#${_selectedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}',
-        tieneGafas: false, // Mantenemos el modelo pero forzado a false
+        tieneGafas: false,
       );
 
       context.read<ChildCubit>().addChild(newChild);
@@ -86,7 +86,7 @@ class _CreateChildDialogState extends State<CreateChildDialog> {
       child: DefaultTabController(
         length: 2,
         child: Container(
-          constraints: const BoxConstraints(maxHeight: 450), // Un poco más pequeño al quitar las gafas
+          constraints: const BoxConstraints(maxHeight: 450),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

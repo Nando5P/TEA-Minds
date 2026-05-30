@@ -18,7 +18,7 @@ class AuthRepositoryImpl implements AuthRepository {
     
     if (credential?.user != null) {
       // 2. Si la cuenta se crea, guardamos los datos extras en Firestore
-      // Usamos el UserModel que creamos antes para el toMap()
+      // Usamos el UserModel para el toMap()
       final userModel = UserModel(
         uid: credential!.user!.uid,
         nombreCompleto: user.nombreCompleto,

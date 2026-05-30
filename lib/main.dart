@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
 
-// Capa de Dominio (Interfaces) - IMPORTANTES PARA EL TIPADO
+// Capa de Dominio (Interfaces)
 import 'package:tea_minds/domain/repositories/auth_repository.dart';
 import 'package:tea_minds/domain/repositories/child_repository.dart';
 
@@ -27,7 +27,7 @@ void main() async {
   );
 
   final authService = AuthService();
-  // Definimos las variables con el tipo de la INTERFAZ (clase abstracta)
+  // Definimos las variables con el tipo de la INTERFAZ
   final AuthRepository authRepository = AuthRepositoryImpl(authService);
   final ChildRepository childRepository = ChildRepositoryImpl();
 

@@ -131,7 +131,7 @@ class _MathMenuPageState extends State<MathMenuPage> {
               child: Padding(
                 padding: const EdgeInsets.all(6.0),
                 child: FilterChip(
-                  showCheckmark: false, // Eliminamos el tic que descuadra
+                  showCheckmark: false,
                   label: Container(
                     constraints: const BoxConstraints(minHeight: 45),
                     alignment: Alignment.center,

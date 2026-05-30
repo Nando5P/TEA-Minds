@@ -107,7 +107,7 @@ class _MathGamePageState extends State<MathGamePage> {
 
                     // --- MENSAJE DE FEEDBACK ---
                     SizedBox(
-                      height: 50, // Reducido un poco
+                      height: 50,
                       child: Center(
                         child: AnimatedOpacity(
                           opacity: _isShowingFeedback ? 1.0 : 0.0,
@@ -136,7 +136,6 @@ class _MathGamePageState extends State<MathGamePage> {
                       children: [
                         // --- ÁREA DE LA OPERACIÓN ---
                         Container(
-                          // Aquí estaba el problema: vertical era 40, lo hemos bajado a 20
                           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
                           width: double.infinity,
                           decoration: BoxDecoration(
@@ -170,7 +169,7 @@ class _MathGamePageState extends State<MathGamePage> {
                           ),
                         ),
 
-                        // ESPACIO MUY REDUCIDO ENTRE OPERACIÓN Y BOTONES
+                        // ESPACIO REDUCIDO ENTRE OPERACIÓN Y BOTONES
                         const SizedBox(height: 15), 
 
                         // --- GRILLA DE OPCIONES ---
@@ -179,9 +178,9 @@ class _MathGamePageState extends State<MathGamePage> {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 15, // Un poco más juntos horizontalmente
-                            mainAxisSpacing: 15,  // Un poco más juntos verticalmente
-                            childAspectRatio: 1.6, // Botones un pelín más anchos que altos
+                            crossAxisSpacing: 15, 
+                            mainAxisSpacing: 15,  
+                            childAspectRatio: 1.6,
                           ),
                           itemCount: state.options.length,
                           itemBuilder: (context, index) {

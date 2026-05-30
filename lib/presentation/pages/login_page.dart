@@ -36,11 +36,9 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // --- HEADER (Imagen de los pollitos en la biblioteca) ---
                   _buildHeader(),
                   const SizedBox(height: 32),
                   
-                  // --- FORMULARIO (Caja Blanca) ---
                   _buildLoginForm(context),
                   
                   const SizedBox(height: 24),

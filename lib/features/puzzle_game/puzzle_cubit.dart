@@ -7,7 +7,7 @@ import '../../domain/repositories/child_repository.dart';
 
 class PuzzleState {
   final bool isWin;
-  final bool isError; // <--- Añadida para el mensaje "¡OH NO!"
+  final bool isError;
   final PuzzleItem? targetItem;
   final List<PuzzleItem> options;
   final int currentScore;

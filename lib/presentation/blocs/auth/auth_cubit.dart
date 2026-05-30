@@ -49,7 +49,6 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.signUp(newUser, password);
       emit(AuthAuthenticated(newUser));
     } on FirebaseAuthException catch (e) {
-      // AQUÍ ESTABA EL CAMBIO: Emitimos e.code en lugar del string completo
       emit(AuthError(e.code));
     } catch (e) {
       emit(AuthError("unknown"));

@@ -44,9 +44,9 @@ class Game1Page extends StatelessWidget {
                   ],
                 ),
 
-                // 2. MENSAJE DE FEEDBACK (Estilo unificado con Mates)
+                // 2. MENSAJE DE FEEDBACK
                 SizedBox(
-                  height: 60, // Mantenemos el espacio para que no haya saltos
+                  height: 60, 
                   child: AnimatedOpacity(
                     opacity: (state.isWin || (state.isError ?? false)) ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 200),
@@ -63,7 +63,7 @@ class Game1Page extends StatelessWidget {
                   ),
                 ),
 
-                // 3. ZONA DE DESTINO (Silueta)
+                // 3. ZONA DE SILUETA
                 DragTarget<String>(
                   onAcceptWithDetails: (details) => context.read<PuzzleCubit>().checkMatch(details.data),
                   builder: (context, candidate, rejected) {

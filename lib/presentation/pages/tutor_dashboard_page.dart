@@ -8,7 +8,7 @@ import '../../core/widgets/tea_snackbars.dart';
 import '../blocs/auth/auth_cubit.dart';
 import '../blocs/auth/auth_state.dart';
 import '../blocs/child/child_cubit.dart';
-import 'child_hub_page.dart'; 
+import 'child_hub_page.dart';
 import 'create_child_dialog.dart';
 import 'tutor_stats_page.dart';
 
@@ -16,15 +16,22 @@ class TutorDashboardPage extends StatelessWidget {
   const TutorDashboardPage({super.key});
 
   @override
-  Widget build(BuildContext mainContext) { 
+  Widget build(BuildContext mainContext) {
     final authState = mainContext.read<AuthCubit>().state;
-    final String tutorId = (authState is AuthAuthenticated) ? authState.user.uid : '';
+    final String tutorId = (authState is AuthAuthenticated)
+        ? authState.user.uid
+        : '';
 
     return Scaffold(
       backgroundColor: TEAColors.background,
       appBar: AppBar(
-        title: const Text('Mis Pollitos', 
-          style: TextStyle(fontWeight: FontWeight.bold, color: TEAColors.textPrimary)),
+        title: const Text(
+          'Mis Pollitos',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: TEAColors.textPrimary,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -58,7 +65,7 @@ class TutorDashboardPage extends StatelessWidget {
             itemCount: children.length,
             itemBuilder: (gridContext, index) {
               final child = children[index];
-              return _buildChildCard(mainContext, child, tutorId); 
+              return _buildChildCard(mainContext, child, tutorId);
             },
           );
         },
@@ -70,31 +77,30 @@ class TutorDashboardPage extends StatelessWidget {
         ),
         backgroundColor: TEAColors.bluePastel,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Nuevo Pollito', style: TextStyle(color: Colors.white)),
+        label: const Text(
+          'Nuevo Pollito',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
 
   Widget _buildChildCard(BuildContext context, Child child, String tutorId) {
-    // 1. Mapeo de colores (esto depende de cómo guardes el color en Firestore)
-    // Extraemos el valor hexadecimal y lo pasamos a mayúsculas
     final colorHex = child.color.toUpperCase();
     String colorName = 'orange'; // Imagen por defecto
 
-    // Mapeo básico basándonos en los HEX pastel de CreateChildDialog
     if (colorHex.contains('BBDEFB')) {
       colorName = 'blue';
     } else if (colorHex.contains('E1BEE7')) {
       colorName = 'purple';
     } else if (colorHex.contains('F8BBD0')) {
-      colorName = 'red'; // Usamos red.png para el rosa pastel
+      colorName = 'red';
     } else if (colorHex.contains('C8E6C9') || colorHex.contains('A5D6A7')) {
-      // Ajusta estos valores HEX por los exactos de TEAColors.greenPastel si no coincide
       colorName = 'green';
     }
 
     return GestureDetector(
-      onTap: () => _showActionMenu(context, child, tutorId), 
+      onTap: () => _showActionMenu(context, child, tutorId),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -110,13 +116,13 @@ class TutorDashboardPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // --- AQUÍ USAMOS TUS IMÁGENES REALES ---
             Image.asset(
               'assets/images/pollitos/$colorName.png',
               width: 80,
               height: 80,
-              // Si falla la carga de la imagen, mostramos un huevo amarillo de seguridad
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.egg, size: 80, color: Colors.amber),
+              // Si falla la carga de la imagen, se muestra un huevo amarillo de seguridad
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.egg, size: 80, color: Colors.amber),
             ),
             const SizedBox(height: 15),
             Text(
@@ -147,7 +153,10 @@ class TutorDashboardPage extends StatelessWidget {
             children: [
               Text(
                 '¿Qué quieres hacer con ${child.nombre}?',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 25),
               ListTile(
@@ -155,11 +164,14 @@ class TutorDashboardPage extends StatelessWidget {
                   backgroundColor: TEAColors.bluePastel,
                   child: Icon(Icons.play_arrow, color: Colors.white),
                 ),
-                title: const Text('Ir a jugar', style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Ir a jugar',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: const Text('Acceder al panel de juegos'),
                 onTap: () {
-                  Navigator.pop(modalContext); 
-                  context.read<ChildCubit>().selectChild(child); 
+                  Navigator.pop(modalContext);
+                  context.read<ChildCubit>().selectChild(child);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -174,13 +186,18 @@ class TutorDashboardPage extends StatelessWidget {
                   backgroundColor: Colors.orange[100],
                   child: const Icon(Icons.bar_chart, color: Colors.orange),
                 ),
-                title: const Text('Ver progreso', style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Ver progreso',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: const Text('Estadísticas y aciertos'),
                 onTap: () {
-                  Navigator.pop(modalContext); 
+                  Navigator.pop(modalContext);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => TutorStatsPage(child: child)),
+                    MaterialPageRoute(
+                      builder: (_) => TutorStatsPage(child: child),
+                    ),
                   );
                 },
               ),
@@ -190,12 +207,20 @@ class TutorDashboardPage extends StatelessWidget {
                   backgroundColor: TEAColors.chickyYellow,
                   child: Icon(Icons.copy, color: TEAColors.textPrimary),
                 ),
-                title: const Text('Copiar ID del pollito', style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Copiar ID del pollito',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 subtitle: const Text('Comparte este código para vincularlo'),
                 onTap: () {
-                  Navigator.pop(modalContext); 
+                  Navigator.pop(modalContext);
                   Clipboard.setData(ClipboardData(text: child.id));
-                  TEASnackBars.show(context, message: '¡ID de ${child.nombre} copiado al portapapeles! 📋', isError: false);
+                  TEASnackBars.show(
+                    context,
+                    message:
+                        '¡ID de ${child.nombre} copiado al portapapeles! 📋',
+                    isError: false,
+                  );
                 },
               ),
               const Divider(),
@@ -204,10 +229,16 @@ class TutorDashboardPage extends StatelessWidget {
                   backgroundColor: TEAColors.errorPastel,
                   child: Icon(Icons.delete_outline, color: Colors.white),
                 ),
-                title: const Text('Borrar pollito', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                title: const Text(
+                  'Borrar pollito',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
                 subtitle: const Text('Eliminar o desvincular perfil'),
                 onTap: () {
-                  Navigator.pop(modalContext); 
+                  Navigator.pop(modalContext);
                   _showDeleteConfirmation(context, child, tutorId);
                 },
               ),
@@ -219,10 +250,16 @@ class TutorDashboardPage extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext safeContext, Child child, String tutorId) {
-    final bool isOnlyTutor = child.tutorIds.length <= 1; 
-    final String title = isOnlyTutor ? '¿Borrar perfil?' : '¿Desvincular perfil?';
-    final String content = isOnlyTutor 
+  void _showDeleteConfirmation(
+    BuildContext safeContext,
+    Child child,
+    String tutorId,
+  ) {
+    final bool isOnlyTutor = child.tutorIds.length <= 1;
+    final String title = isOnlyTutor
+        ? '¿Borrar perfil?'
+        : '¿Desvincular perfil?';
+    final String content = isOnlyTutor
         ? 'Eres el único tutor de ${child.nombre}. Si lo borras, sus datos y estadísticas se perderán para siempre.'
         : 'Compartes a ${child.nombre} con otros tutores. Solo se eliminará de tu lista, pero los demás podrán seguir viéndolo.';
 
@@ -230,27 +267,45 @@ class TutorDashboardPage extends StatelessWidget {
       context: safeContext,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: TEAColors.textPrimary)),
-        content: Text(content, style: const TextStyle(color: TEAColors.textSecondary, fontSize: 16)),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: TEAColors.textPrimary,
+          ),
+        ),
+        content: Text(
+          content,
+          style: const TextStyle(color: TEAColors.textSecondary, fontSize: 16),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar', style: TextStyle(color: TEAColors.textSecondary)),
+            child: const Text(
+              'Cancelar',
+              style: TextStyle(color: TEAColors.textSecondary),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(dialogContext); // Cerramos el diálogo flotante
-              
-              // Como estamos usando safeContext (mainContext), no importa que se borre la tarjeta
-              TEASnackBars.show(safeContext, message: 'Adiós, ${child.nombre} 🐣', isError: false);
-              
+
+              // Mostramos el SnackBar de despedida
+              TEASnackBars.show(
+                safeContext,
+                message: 'Adiós, ${child.nombre} 🐣',
+                isError: false,
+              );
+
               // Disparamos la lógica de Firebase
               safeContext.read<ChildCubit>().removeChild(child, tutorId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: TEAColors.errorPastel,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text('Confirmar'),
           ),
@@ -266,8 +321,14 @@ class TutorDashboardPage extends StatelessWidget {
         children: [
           const Text('🐣', style: TextStyle(fontSize: 80)),
           const SizedBox(height: 20),
-          const Text('No tienes pollitos registrados', 
-            style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold)),
+          const Text(
+            'No tienes pollitos registrados',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

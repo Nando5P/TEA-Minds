@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PuzzleItem {
   final String id;
-  final String emoji;      // Usaremos emojis para que sea funcional ya
+  final String emoji;      // En el futuro cambiar a array de emojis para más variedad
   final String nombre;
   final Color color;
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fl_chart/fl_chart.dart'; // Librería de gráficos
+import 'package:fl_chart/fl_chart.dart'; 
 import '../../domain/entities/child_entity.dart';
 import '../../domain/repositories/child_repository.dart';
 import '../../core/theme/teaColors.dart';
@@ -126,7 +126,6 @@ class TutorStatsPage extends StatelessWidget {
     );
   }
 
-  // Resto de componentes (SummaryCard y Lista)
   Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
     return Expanded(
       child: Container(
@@ -174,7 +173,6 @@ class TutorStatsPage extends StatelessWidget {
   }
 }
 
-// Widget auxiliar para la leyenda
 class _LegendItem extends StatelessWidget {
   final Color color;
   final String text;

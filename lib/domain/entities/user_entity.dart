@@ -6,7 +6,7 @@ class UserApp {
   final String nombreCompleto;
   final String email;
   final UserRole rol;
-  final String pinSeguridad;      // El hash del PIN
+  final String pinSeguridad;
   final List<String> listaNinos;  // IDs de los pollitos vinculados
 
   UserApp({

@@ -21,11 +21,10 @@ class MemoryState {
 class MemoryCubit extends Cubit<MemoryState> {
   final Child child;
 
-  // Ya no necesitamos el repositorio aquí porque no guardamos nada
   MemoryCubit({required this.child}) : super(MemoryState(cards: []));
 
   void initGame() {
-    List<String> emojis = ['🐶', '🐱', '🐘', '🐯', '🦁', '🐷'];
+    List<String> emojis = ['🐶', '🐱', '🐘', '🐯', '🦁', '🐷']; // , '🐸', '🐵', '🐔', '🐧'
     List<String> items = [...emojis, ...emojis]..shuffle();
     
     List<MemoryCard> cards = List.generate(

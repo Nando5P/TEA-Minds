@@ -14,9 +14,8 @@ class AuthService {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      // Aquí capturamos el código técnico (ej: 'email-already-in-use')
       print("Error en registro: ${e.code}");
-      rethrow; // Lo relanzamos para que el Cubit/UI lo capture
+      rethrow;
     }
   }
 
@@ -38,8 +37,7 @@ class AuthService {
     await _auth.signOut();
   }
 
-  // --- EL TRADUCTOR MÁGICO ---
-  // Este método estático te servirá en cualquier parte de la app
+  // --- EL TRADUCTOR DE ERRORES ---
   static String getFriendlyErrorMessage(String code) {
     switch (code) {
       case 'email-already-in-use':

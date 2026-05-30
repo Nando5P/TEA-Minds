@@ -37,7 +37,7 @@ class ChildCubit extends Cubit<ChildState> {
     }
   }
 
-  // --- NUEVA FUNCIÓN PARA BORRAR ---
+  // --- FUNCIÓN PARA BORRAR ---
   Future<void> removeChild(Child child, String tutorId) async {
     try {
       await _repository.removeChild(child.id, tutorId, child.tutorIds);

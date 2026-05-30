@@ -2,7 +2,7 @@ import '../../../domain/entities/child_entity.dart';
 
 class ChildState {
   final List<Child> children;
-  final Child? selectedChild; // El niño que está jugando actualmente
+  final Child? selectedChild;
   final bool isLoading;
   final String? error;
 
@@ -13,7 +13,6 @@ class ChildState {
     this.error,
   });
 
-  // Método para crear una copia del estado cambiando solo lo que necesitemos
   ChildState copyWith({
     List<Child>? children,
     Child? selectedChild,
@@ -22,7 +21,7 @@ class ChildState {
   }) {
     return ChildState(
       children: children ?? this.children,
-      selectedChild: selectedChild ?? this.selectedChild, // Permitimos que sea null
+      selectedChild: selectedChild ?? this.selectedChild,
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );

@@ -40,7 +40,7 @@ class Game2Page extends StatelessWidget {
                       return FlipCardWidget(
                         isFlipped: card.isFlipped || card.isMatched,
                         onTap: () => context.read<MemoryCubit>().flipCard(index),
-                        // Cara delantera: Azul con "?" blanco
+                        // Cara frontal: Azul con "?" blanco
                         front: _buildCardContainer(
                           color: TEAColors.bluePastel,
                           child: const Text('?', 
